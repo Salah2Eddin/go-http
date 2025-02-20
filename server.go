@@ -3,11 +3,12 @@ package main
 import (
 	"bufio"
 	"ducky/http/pkg/parsers"
+	"ducky/http/pkg/router"
 	"fmt"
 	"net"
 )
 
-func handleRequest(conn net.Conn) {
+func handleRequest(conn net.Conn, router *router.Router) {
 	defer conn.Close()
 	reader := bufio.NewReader(conn)
 
@@ -17,7 +18,11 @@ func handleRequest(conn net.Conn) {
 		return
 	}
 
-	println(request.Line.Method)
+	err = router.Route(request)
+	if err != nil {
+		fmt.Println("Response Error:", err.Error())
+		return
+	}
 }
 
 func main() {
@@ -28,6 +33,9 @@ func main() {
 	defer listner.Close()
 
 	fmt.Println("Listening on: ", listner.Addr())
+
+	router := router.NewRouter()
+
 	for {
 		conn, err := listner.Accept()
 		if err != nil {
@@ -35,6 +43,6 @@ func main() {
 			continue
 		}
 		fmt.Printf("%s Connected\n", conn.RemoteAddr())
-		go handleRequest(conn)
+		go handleRequest(conn, router)
 	}
 }
