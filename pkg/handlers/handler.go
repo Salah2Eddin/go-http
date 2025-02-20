@@ -5,5 +5,5 @@ import (
 )
 
 type Handler interface {
-	Handle(request.Request) error
+	Handle(*request.Request) error
 }
