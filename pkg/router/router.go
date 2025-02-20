@@ -1,8 +1,9 @@
 package router
 
 import (
-	"ducky/http/pkg/errors"
 	"ducky/http/pkg/request"
+	"ducky/http/pkg/response"
+	statuscodes "ducky/http/pkg/response/status_codes"
 )
 
 type Router struct {
@@ -25,12 +26,12 @@ func (router *Router) NewRoute(uri string) *route {
 	return route
 }
 
-func (router *Router) Route(request *request.Request) error {
+func (router *Router) Route(request *request.Request) *response.Response {
 	uri := request.Line.Uri
 	route, exists := router.routes[uri]
 	if !exists {
-		return &errors.ErrInvalidRoute{Uri: uri}
+		return response.NewErrorResponse(statuscodes.Status404())
 	}
-	err := route.handle(request)
-	return err
+	response := route.handle(request)
+	return response
 }

@@ -6,12 +6,28 @@ type Response struct {
 	Body    *[]byte
 }
 
+func NewErrorResponse(line *StatusLine) *Response {
+	body := make([]byte, 0)
+	return &Response{
+		Line:    line,
+		Headers: &ResponseHeaders{},
+		Body:    &body,
+	}
+}
+
 func NewResponse(line *StatusLine, headers *ResponseHeaders, body *[]byte) *Response {
 	return &Response{
 		Line:    line,
 		Headers: headers,
 		Body:    body,
 	}
+}
+
+func (res Response) String() string {
+	line_bytes := res.Line.String()
+	header_bytes := res.Headers.String()
+
+	return line_bytes + header_bytes + string(*res.Body)
 }
 
 func (res Response) Bytes() []byte {
