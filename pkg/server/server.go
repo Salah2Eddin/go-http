@@ -50,7 +50,7 @@ func (server *Server) handleRequest(conn net.Conn) {
 		return
 	}
 
-	response := server.router.Route(request)
+	response := server.router.RouteRequest(request)
 	conn.Write([]byte(response.String()))
 }
 
