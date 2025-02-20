@@ -1,12 +1,19 @@
 package router
 
 import (
+	"ducky/http/pkg/errors"
 	"ducky/http/pkg/handlers"
 	"ducky/http/pkg/request"
 )
 
 type Route struct {
 	method_handlers map[string]handlers.Handler
+}
+
+func NewRoute() *Route {
+	route := Route{}
+	route.method_handlers = make(map[string]handlers.Handler)
+	return &route
 }
 
 func (route *Route) AddHandler(method string, handler handlers.Handler) {

@@ -9,6 +9,12 @@ type Router struct {
 	routes map[string]Route
 }
 
+func NewRouter() *Router {
+	router := Router{}
+	router.routes = make(map[string]Route)
+	return &router
+}
+
 func (router *Router) AddRoute(uri string, route Route) {
 	router.routes[uri] = route
 }
