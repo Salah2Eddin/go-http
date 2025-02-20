@@ -17,7 +17,10 @@ func (route *Route) Handle(request *request.Request) error {
 	method := request.Line.Method
 	handler, exists := route.method_handlers[method]
 	if !exists {
-		return nil
+		return &errors.ErrMethodNotAllowed{
+			Method: request.Line.Method,
+			Uri:    request.Line.Uri,
+		}
 	}
 
 	err := handler.Handle(request)
