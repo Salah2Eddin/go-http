@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	index_handlers "ducky/http/pkg/handlers/index"
 	"ducky/http/pkg/parsers"
 	"ducky/http/pkg/router"
 	"fmt"
@@ -35,6 +36,8 @@ func main() {
 	fmt.Println("Listening on: ", listner.Addr())
 
 	router := router.NewRouter()
+	index := router.NewRoute("/")
+	index.AddHandler("GET", index_handlers.GET)
 
 	for {
 		conn, err := listner.Accept()
