@@ -26,6 +26,11 @@ func (router *Router) NewRoute(uri string) *route {
 	return route
 }
 
+func (router *Router) GetRoute(uri string) (*route, bool) {
+	route, exists := router.routes[uri]
+	return route, exists
+}
+
 func (router *Router) Route(request *request.Request) *response.Response {
 	uri := request.Line.Uri
 	route, exists := router.routes[uri]
