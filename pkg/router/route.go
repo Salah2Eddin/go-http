@@ -9,7 +9,7 @@ type Route struct {
 	method_handlers map[string]handlers.Handler
 }
 
-func (route *Route) addHandler(method string, handler handlers.Handler) {
+func (route *Route) AddHandler(method string, handler handlers.Handler) {
 	route.method_handlers[method] = handler
 }
 
