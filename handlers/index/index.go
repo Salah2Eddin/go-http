@@ -1,4 +1,4 @@
-package index_handlers
+package index
 
 import (
 	"ducky/http/pkg/request"
