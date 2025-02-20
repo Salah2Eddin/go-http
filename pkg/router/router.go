@@ -6,17 +6,23 @@ import (
 )
 
 type Router struct {
-	routes map[string]*Route
+	routes map[string]*route
 }
 
 func NewRouter() *Router {
 	router := Router{}
-	router.routes = make(map[string]*Route)
+	router.routes = make(map[string]*route)
 	return &router
 }
 
-func (router *Router) AddRoute(uri string, route *Route) {
+func (router *Router) AddRoute(uri string, route *route) {
 	router.routes[uri] = route
+}
+
+func (router *Router) NewRoute(uri string) *route {
+	route := newRoute()
+	router.routes[uri] = route
+	return route
 }
 
 func (router *Router) Route(request *request.Request) error {
@@ -25,6 +31,6 @@ func (router *Router) Route(request *request.Request) error {
 	if !exists {
 		return &errors.ErrInvalidRoute{Uri: uri}
 	}
-	err := route.Handle(request)
+	err := route.handle(request)
 	return err
 }

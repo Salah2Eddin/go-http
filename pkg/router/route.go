@@ -2,25 +2,26 @@ package router
 
 import (
 	"ducky/http/pkg/errors"
-	"ducky/http/pkg/handlers"
 	"ducky/http/pkg/request"
 )
 
-type Route struct {
-	method_handlers map[string]handlers.Handler
+type Handler func(request *request.Request) error
+
+type route struct {
+	method_handlers map[string]Handler
 }
 
-func NewRoute() *Route {
-	route := Route{}
-	route.method_handlers = make(map[string]handlers.Handler)
+func newRoute() *route {
+	route := route{}
+	route.method_handlers = make(map[string]Handler)
 	return &route
 }
 
-func (route *Route) AddHandler(method string, handler handlers.Handler) {
+func (route *route) AddHandler(method string, handler Handler) {
 	route.method_handlers[method] = handler
 }
 
-func (route *Route) Handle(request *request.Request) error {
+func (route *route) handle(request *request.Request) error {
 	method := request.Line.Method
 	handler, exists := route.method_handlers[method]
 	if !exists {
@@ -30,6 +31,6 @@ func (route *Route) Handle(request *request.Request) error {
 		}
 	}
 
-	err := handler.Handle(request)
+	err := handler(request)
 	return err
 }
