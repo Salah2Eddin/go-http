@@ -3,7 +3,7 @@ package index
 import (
 	"ducky/http/pkg/request"
 	"ducky/http/pkg/response"
-	statuscodes "ducky/http/pkg/response/status_codes"
+	statuscodes "ducky/http/pkg/response/statuscodes"
 )
 
 func GET(request *request.Request) *response.Response {

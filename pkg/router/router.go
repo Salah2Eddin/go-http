@@ -3,7 +3,7 @@ package router
 import (
 	"ducky/http/pkg/request"
 	"ducky/http/pkg/response"
-	statuscodes "ducky/http/pkg/response/status_codes"
+	"ducky/http/pkg/response/statuscodes"
 )
 
 type Router struct {
