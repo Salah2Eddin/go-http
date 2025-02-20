@@ -1,11 +1,12 @@
 package router
 
 import (
-	"ducky/http/pkg/errors"
 	"ducky/http/pkg/request"
+	"ducky/http/pkg/response"
+	statuscodes "ducky/http/pkg/response/status_codes"
 )
 
-type Handler func(request *request.Request) error
+type Handler func(request *request.Request) *response.Response
 
 type route struct {
 	method_handlers map[string]Handler
@@ -21,16 +22,13 @@ func (route *route) AddHandler(method string, handler Handler) {
 	route.method_handlers[method] = handler
 }
 
-func (route *route) handle(request *request.Request) error {
+func (route *route) handle(request *request.Request) *response.Response {
 	method := request.Line.Method
 	handler, exists := route.method_handlers[method]
 	if !exists {
-		return &errors.ErrMethodNotAllowed{
-			Method: request.Line.Method,
-			Uri:    request.Line.Uri,
-		}
+		return response.NewErrorResponse(statuscodes.Status400())
 	}
 
-	err := handler(request)
-	return err
+	response := handler(request)
+	return response
 }

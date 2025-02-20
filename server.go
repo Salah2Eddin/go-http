@@ -19,11 +19,8 @@ func handleRequest(conn net.Conn, router *router.Router) {
 		return
 	}
 
-	err = router.Route(request)
-	if err != nil {
-		fmt.Println("Response Error:", err.Error())
-		return
-	}
+	response := router.Route(request)
+	conn.Write([]byte(response.String()))
 }
 
 func main() {
