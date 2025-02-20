@@ -2,37 +2,39 @@ package main
 
 import (
 	"bufio"
+	"ducky/http/pkg/parsers"
 	"fmt"
 	"net"
 )
 
-func handle_request(conn net.Conn) {
+func handleRequest(conn net.Conn) {
 	defer conn.Close()
-	scanner := bufio.NewScanner(conn)
+	reader := bufio.NewReader(conn)
 
-	for scanner.Scan() {
-		message := scanner.Text()
-		if message == "" {
-			break
-		}
-		fmt.Println(message)
+	request, err := parsers.ParseRequest(reader)
+	if err != nil {
+		fmt.Println("Request Error:", err.Error())
+		return
 	}
+
+	println(request.Line.Method)
 }
 
 func main() {
 	listner, err := net.Listen("tcp4", ":3490")
 	if err != nil {
-		fmt.Println("Error")
+		fmt.Println("Error on listening:", err.Error())
 	}
 	defer listner.Close()
 
-	fmt.Printf("Listening on address: %s\n", listner.Addr())
+	fmt.Println("Listening on: ", listner.Addr())
 	for {
 		conn, err := listner.Accept()
 		if err != nil {
-			fmt.Printf("Error %s\n", err.Error())
+			fmt.Println("Error on connection acceptance:", err.Error())
 			continue
 		}
-		go handle_request(conn)
+		fmt.Printf("%s Connected\n", conn.RemoteAddr())
+		go handleRequest(conn)
 	}
 }
