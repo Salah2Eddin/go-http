@@ -44,10 +44,10 @@ To create a server, follow these steps:
 package main
 
 import (
-    "ducky/http/pkg/request"
-    "ducky/http/pkg/response"
-    "ducky/http/pkg/server"
-    statuscodes "ducky/http/pkg/response/statuscodes"
+	  "ducky/http/pkg/request"
+	  "ducky/http/pkg/response"
+	  statuscodes "ducky/http/pkg/response/statuscodes"
+	  "ducky/http/pkg/server"
 )
 
 func index(request *request.Request) *response.Response {
