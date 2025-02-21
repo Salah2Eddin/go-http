@@ -3,7 +3,7 @@ package router
 import (
 	"ducky/http/pkg/request"
 	"ducky/http/pkg/response"
-	statuscodes "ducky/http/pkg/response/status_codes"
+	"ducky/http/pkg/response/statuscodes"
 )
 
 type Router struct {
@@ -26,7 +26,12 @@ func (router *Router) NewRoute(uri string) *route {
 	return route
 }
 
-func (router *Router) Route(request *request.Request) *response.Response {
+func (router *Router) GetRoute(uri string) (*route, bool) {
+	route, exists := router.routes[uri]
+	return route, exists
+}
+
+func (router *Router) RouteRequest(request *request.Request) *response.Response {
 	uri := request.Line.Uri
 	route, exists := router.routes[uri]
 	if !exists {

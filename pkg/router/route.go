@@ -3,7 +3,7 @@ package router
 import (
 	"ducky/http/pkg/request"
 	"ducky/http/pkg/response"
-	statuscodes "ducky/http/pkg/response/status_codes"
+	"ducky/http/pkg/response/statuscodes"
 )
 
 type Handler func(request *request.Request) *response.Response
@@ -26,6 +26,8 @@ func (route *route) handle(request *request.Request) *response.Response {
 	method := request.Line.Method
 	handler, exists := route.method_handlers[method]
 	if !exists {
+		// should be Error 405 but it wasn't introduced in HTTP/1.0
+		// so i settled with error 400 instead
 		return response.NewErrorResponse(statuscodes.Status400())
 	}
 
