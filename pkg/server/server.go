@@ -17,7 +17,8 @@ type Server struct {
 	addr   *ServerAddress
 }
 
-// Creates a new Server object
+// Creates and initializes a new Server instance.
+// If no address is provided, it defaults to an empty ServerAddress.
 func NewServer(address *ServerAddress) *Server {
 	server := &Server{addr: address}
 	if address == nil {
@@ -29,6 +30,8 @@ func NewServer(address *ServerAddress) *Server {
 	return server
 }
 
+// Registers a new handler for the given URI and HTTP method.
+// If the route corresponding to the URI does not exist, a new route is created.
 func (server *Server) AddHandler(uri string, method string, handler router.Handler) {
 	route, exists := server.router.GetRoute(uri)
 	if !exists {
@@ -37,10 +40,11 @@ func (server *Server) AddHandler(uri string, method string, handler router.Handl
 	route.AddHandler(method, handler)
 }
 
+// Returns the appropriate HTTP status code
+// based on the type of error encountered.
 func getErrorStatusCode(err error) *response.StatusLine {
 	var status_line *response.StatusLine
 
-	// gets the correct status code based on the error
 	switch err.(type) {
 	case errors.ErrInvalidHeader, errors.ErrInvalidRequestLine:
 		status_line = statuscodes.Status400()
@@ -50,6 +54,9 @@ func getErrorStatusCode(err error) *response.StatusLine {
 	return status_line
 }
 
+// Handles an incoming client connection.
+// It reads and parses the request, processes it, writes the response,
+// and then closes the connection.
 func (server *Server) processConnection(conn net.Conn) {
 	defer conn.Close()
 	reader := bufio.NewReader(conn)
@@ -65,6 +72,8 @@ func (server *Server) processConnection(conn net.Conn) {
 	conn.Write([]byte(res.String()))
 }
 
+// Initializes the server, listens for incoming connections,
+// and handles them concurrently.
 func (server *Server) Start() {
 	listner, err := net.Listen("tcp4", server.addr.String())
 	if err != nil {
