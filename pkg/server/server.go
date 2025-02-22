@@ -3,6 +3,8 @@ package server
 import (
 	"bufio"
 	"ducky/http/pkg/parsers"
+	"ducky/http/pkg/response"
+	"ducky/http/pkg/response/statuscodes"
 	"ducky/http/pkg/router"
 	"fmt"
 	"net"
@@ -45,13 +47,15 @@ func (server *Server) handleRequest(conn net.Conn) {
 	reader := bufio.NewReader(conn)
 
 	request, err := parsers.ParseRequest(reader)
+	var res *response.Response
 	if err != nil {
-		fmt.Println("Request Error:", err.Error())
-		return
+		// maybe add a type switch later for each type of errors
+		res = response.NewEmptyResponse(statuscodes.Status400())
+	} else {
+		res = server.router.RouteRequest(request)
 	}
 
-	response := server.router.RouteRequest(request)
-	conn.Write([]byte(response.String()))
+	conn.Write([]byte(res.String()))
 }
 
 func (server *Server) Start() {
