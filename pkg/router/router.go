@@ -35,7 +35,7 @@ func (router *Router) RouteRequest(request *request.Request) *response.Response 
 	uri := request.Uri()
 	route, exists := router.routes[uri]
 	if !exists {
-		return response.NewErrorResponse(statuscodes.Status404())
+		return response.NewEmptyResponse(statuscodes.Status404())
 	}
 	response := route.handle(request)
 	return response

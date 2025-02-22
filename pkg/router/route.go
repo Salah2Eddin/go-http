@@ -28,7 +28,7 @@ func (route *route) handle(request *request.Request) *response.Response {
 	if !exists {
 		// should be Error 405 but it wasn't introduced in HTTP/1.0
 		// so i settled with error 400 instead
-		return response.NewErrorResponse(statuscodes.Status400())
+		return response.NewEmptyResponse(statuscodes.Status400())
 	}
 
 	response := handler(request)

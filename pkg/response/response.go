@@ -6,7 +6,7 @@ type Response struct {
 	Body    *[]byte
 }
 
-func NewErrorResponse(line *StatusLine) *Response {
+func NewEmptyResponse(line *StatusLine) *Response {
 	body := make([]byte, 0)
 	return &Response{
 		Line:    line,
