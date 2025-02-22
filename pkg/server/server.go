@@ -56,7 +56,7 @@ func getErrorStatusCode(err error) *response.StatusLine {
 	return status_line
 }
 
-func (server *Server) handleRequest(conn net.Conn) {
+func (server *Server) processConnection(conn net.Conn) {
 	defer conn.Close()
 	reader := bufio.NewReader(conn)
 
@@ -90,6 +90,6 @@ func (server *Server) Start() {
 			continue
 		}
 		fmt.Printf("%s connected\n", conn.RemoteAddr())
-		go server.handleRequest(conn)
+		go server.processConnection(conn)
 	}
 }
