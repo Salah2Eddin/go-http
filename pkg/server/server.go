@@ -14,20 +14,14 @@ import (
 
 type Server struct {
 	router *router.Router
-	ip     string
-	port   string
+	addr   *ServerAddress
 }
 
-type ServerAddress struct {
-	Ip   string
-	Port string
-}
-
+// Creates a new Server object
 func NewServer(address *ServerAddress) *Server {
-	server := &Server{}
-	if address != nil {
-		server.ip = address.Ip
-		server.port = address.Port
+	server := &Server{addr: address}
+	if address == nil {
+		server.addr = &ServerAddress{}
 	}
 
 	server.router = router.NewRouter()
@@ -72,7 +66,7 @@ func (server *Server) processConnection(conn net.Conn) {
 }
 
 func (server *Server) Start() {
-	listner, err := net.Listen("tcp4", fmt.Sprintf("%s:%s", server.ip, server.port))
+	listner, err := net.Listen("tcp4", server.addr.String())
 	if err != nil {
 		fmt.Println("Error creating listner:", err.Error())
 		return
@@ -80,8 +74,8 @@ func (server *Server) Start() {
 	defer listner.Close()
 
 	// update address and port in case they were automatically assigned
-	server.ip, server.port, _ = strings.Cut(listner.Addr().String(), ":")
-	fmt.Printf("Listening on: %s:%s\n", server.ip, server.port)
+	server.addr.Ip, server.addr.Port, _ = strings.Cut(listner.Addr().String(), ":")
+	fmt.Printf("Listening on: %v\n", server.addr)
 
 	for {
 		conn, err := listner.Accept()
