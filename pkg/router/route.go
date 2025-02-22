@@ -23,7 +23,7 @@ func (route *route) AddHandler(method string, handler Handler) {
 }
 
 func (route *route) handle(request *request.Request) *response.Response {
-	method := request.Line.Method
+	method := request.Method()
 	handler, exists := route.method_handlers[method]
 	if !exists {
 		// should be Error 405 but it wasn't introduced in HTTP/1.0
