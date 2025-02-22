@@ -3,7 +3,7 @@ package main
 import (
 	"ducky/http/pkg/request"
 	"ducky/http/pkg/response"
-	statuscodes "ducky/http/pkg/response/statuscodes"
+	"ducky/http/pkg/response/statuscodes"
 	"ducky/http/pkg/server"
 	"fmt"
 )
