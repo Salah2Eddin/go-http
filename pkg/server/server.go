@@ -2,6 +2,7 @@ package server
 
 import (
 	"bufio"
+	"ducky/http/pkg/errors"
 	"ducky/http/pkg/parsers"
 	"ducky/http/pkg/response"
 	"ducky/http/pkg/response/statuscodes"
@@ -42,6 +43,19 @@ func (server *Server) AddHandler(uri string, method string, handler router.Handl
 	route.AddHandler(method, handler)
 }
 
+func getErrorStatusCode(err error) *response.StatusLine {
+	var status_line *response.StatusLine
+
+	// gets the correct status code based on the error
+	switch err.(type) {
+	case errors.ErrInvalidHeader, errors.ErrInvalidRequestLine:
+		status_line = statuscodes.Status400()
+	default:
+		status_line = statuscodes.Status500()
+	}
+	return status_line
+}
+
 func (server *Server) handleRequest(conn net.Conn) {
 	defer conn.Close()
 	reader := bufio.NewReader(conn)
@@ -49,8 +63,7 @@ func (server *Server) handleRequest(conn net.Conn) {
 	request, err := parsers.ParseRequest(reader)
 	var res *response.Response
 	if err != nil {
-		// maybe add a type switch later for each type of errors
-		res = response.NewEmptyResponse(statuscodes.Status400())
+		res = response.NewEmptyResponse(getErrorStatusCode(err))
 	} else {
 		res = server.router.RouteRequest(request)
 	}
