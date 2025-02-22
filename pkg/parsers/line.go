@@ -3,6 +3,7 @@ package parsers
 import (
 	"ducky/http/pkg/errors"
 	"ducky/http/pkg/request"
+	"ducky/http/pkg/uri"
 	"strings"
 )
 
@@ -16,15 +17,6 @@ func validRequestLine(parts []string) bool {
 	return strings.HasPrefix(http_ver, "HTTP")
 }
 
-func requestLineFromParts(parts []string) *request.RequestLine {
-	request_line := request.NewRequestLine(
-		parts[0],
-		parts[1],
-		parts[2],
-	)
-	return request_line
-}
-
 func ParseRequestLine(request_line string) (*request.RequestLine, error) {
 	request_line = strings.TrimSpace(request_line)
 	parts := strings.Fields(request_line)
@@ -33,5 +25,11 @@ func ParseRequestLine(request_line string) (*request.RequestLine, error) {
 		return &request.RequestLine{}, errors.ErrInvalidRequestLine{}
 	}
 
-	return requestLineFromParts(parts), nil
+	uri := uri.NewUri(parts[1])
+
+	return request.NewRequestLine(
+		parts[0], // method
+		uri,
+		parts[2], // http version
+	), nil
 }

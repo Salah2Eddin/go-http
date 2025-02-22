@@ -32,7 +32,7 @@ func (router *Router) GetRoute(uri string) (*route, bool) {
 }
 
 func (router *Router) RouteRequest(request *request.Request) *response.Response {
-	uri := request.Line.Uri
+	uri := request.Uri()
 	route, exists := router.routes[uri]
 	if !exists {
 		return response.NewErrorResponse(statuscodes.Status404())
