@@ -5,7 +5,6 @@ import (
 	"ducky/http/pkg/request"
 	"io"
 	"strconv"
-	"strings"
 )
 
 func checkCRLF(bytes *[]byte) bool {
@@ -18,6 +17,10 @@ func checkCRLF(bytes *[]byte) bool {
 	RF := byte(0x0A)
 
 	return (*bytes)[size-2] == CL && (*bytes)[size-1] == RF
+}
+
+func checkHeadersEnd(bytes *[]byte) bool {
+	return len(*bytes) == 2 && checkCRLF(bytes)
 }
 
 func readLine(reader *bufio.Reader) (*[]byte, error) {
@@ -45,21 +48,23 @@ func ParseRequest(reader *bufio.Reader) (*request.Request, error) {
 		return &request.Request{}, err
 	}
 
-	// request headers
-	var headers []string
+	// request headers_bytes
+	var headers_bytes []*[]byte
 	for {
-		line, err := reader.ReadString('\n')
+		header_bytes, err := readLine(reader)
 		if err != nil {
 			return &request.Request{}, err
 		}
-		line = strings.TrimSpace(line)
-		if line == "" {
+
+		// TODO: add line folding support
+
+		if checkHeadersEnd(header_bytes) {
 			break
 		}
-		headers = append(headers, line)
+		headers_bytes = append(headers_bytes, header_bytes)
 	}
 
-	request_headers, err := parseRequestHeaders(headers)
+	request_headers, err := parseRequestHeaders(&headers_bytes)
 	if err != nil {
 		return &request.Request{}, err
 	}
