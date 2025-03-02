@@ -4,6 +4,7 @@ import (
 	"ducky/http/pkg/errors"
 	"ducky/http/pkg/request"
 	"ducky/http/pkg/uri"
+	"ducky/http/pkg/util"
 	"strings"
 )
 
@@ -17,13 +18,9 @@ func validRequestLine(parts []string) bool {
 	return strings.HasPrefix(http_ver, "HTTP")
 }
 
-func validUSASCII(b byte) bool {
-	return b <= 0 || b >= 0x7F
-}
-
 func validateAsciiEncoding(bytes *[]byte) bool {
 	for _, v := range *bytes {
-		if !validUSASCII(v) {
+		if !util.IsUSASCII(v) {
 			return false
 		}
 	}
