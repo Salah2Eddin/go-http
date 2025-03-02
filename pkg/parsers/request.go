@@ -8,13 +8,39 @@ import (
 	"strings"
 )
 
+func checkCRLF(bytes *[]byte) bool {
+	size := len(*bytes)
+	if size < 2 {
+		return false
+	}
+
+	CL := byte(0x0D)
+	RF := byte(0x0A)
+
+	return (*bytes)[size-2] == CL && (*bytes)[size-1] == RF
+}
+
+func readLine(reader *bufio.Reader) (*[]byte, error) {
+	var line_bytes []byte
+
+	for checkCRLF(&line_bytes) {
+		next, err := reader.ReadByte()
+		if err != nil {
+			return nil, err
+		}
+		line_bytes = append(line_bytes, next)
+	}
+
+	return &line_bytes, nil
+}
+
 func ParseRequest(reader *bufio.Reader) (*request.Request, error) {
 	// request line
-	line, err := reader.ReadString('\n')
+	request_line_bytes, err := readLine(reader)
 	if err != nil {
 		return &request.Request{}, err
 	}
-	requst_line, err := parseRequestLine(line)
+	request_line, err := parseRequestLine(request_line_bytes)
 	if err != nil {
 		return &request.Request{}, err
 	}
@@ -54,6 +80,6 @@ func ParseRequest(reader *bufio.Reader) (*request.Request, error) {
 			return &request.Request{}, err
 		}
 	}
-	request := request.NewRequest(requst_line, request_headers, &request_body)
+	request := request.NewRequest(request_line, request_headers, &request_body)
 	return request, nil
 }

@@ -17,7 +17,27 @@ func validRequestLine(parts []string) bool {
 	return strings.HasPrefix(http_ver, "HTTP")
 }
 
-func parseRequestLine(request_line string) (*request.RequestLine, error) {
+func validUSASCII(b byte) bool {
+	return b <= 0 || b >= 0x7F
+}
+
+func validateAsciiEncoding(bytes *[]byte) bool {
+	for _, v := range *bytes {
+		if !validUSASCII(v) {
+			return false
+		}
+	}
+	return true
+}
+
+func parseRequestLine(request_line_bytes *[]byte) (*request.RequestLine, error) {
+
+	// Request line must contain bytes in the USASCII range only (RFC9112 2.2)
+	if !validateAsciiEncoding(request_line_bytes) {
+		return &request.RequestLine{}, errors.ErrInvalidRequestLine{}
+	}
+
+	request_line := string(*request_line_bytes)
 	request_line = strings.TrimSpace(request_line)
 	parts := strings.Fields(request_line)
 
