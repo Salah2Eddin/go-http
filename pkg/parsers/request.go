@@ -14,7 +14,7 @@ func ParseRequest(reader *bufio.Reader) (*request.Request, error) {
 	if err != nil {
 		return &request.Request{}, err
 	}
-	requst_line, err := ParseRequestLine(line)
+	requst_line, err := parseRequestLine(line)
 	if err != nil {
 		return &request.Request{}, err
 	}
@@ -33,7 +33,7 @@ func ParseRequest(reader *bufio.Reader) (*request.Request, error) {
 		headers = append(headers, line)
 	}
 
-	request_headers, err := ParseRequestHeaders(headers)
+	request_headers, err := parseRequestHeaders(headers)
 	if err != nil {
 		return &request.Request{}, err
 	}

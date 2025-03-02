@@ -26,7 +26,7 @@ func parseHeaderLine(line string) (string, string, error) {
 	return key, value, nil
 }
 
-func ParseRequestHeaders(lines []string) (*request.RequestHeaders, error) {
+func parseRequestHeaders(lines []string) (*request.RequestHeaders, error) {
 	headers := request.NewRequestHeaders()
 	for _, line := range lines {
 		line = strings.TrimSpace(line)

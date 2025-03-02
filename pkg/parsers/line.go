@@ -17,7 +17,7 @@ func validRequestLine(parts []string) bool {
 	return strings.HasPrefix(http_ver, "HTTP")
 }
 
-func ParseRequestLine(request_line string) (*request.RequestLine, error) {
+func parseRequestLine(request_line string) (*request.RequestLine, error) {
 	request_line = strings.TrimSpace(request_line)
 	parts := strings.Fields(request_line)
 
