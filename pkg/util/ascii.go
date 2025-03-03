@@ -20,3 +20,7 @@ func IsCTLCharASCII(b byte) bool {
 	*/
 	return b <= 0x1F || b == 0x7F
 }
+
+func IsWhiteSpaceASCII(b byte) bool {
+	return b == 0x20 || b == 0x09
+}
