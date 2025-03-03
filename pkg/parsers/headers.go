@@ -62,9 +62,7 @@ func splitHeaderValues(value_bytes []byte) ([][]byte, error) {
 			continue
 		}
 
-		// asfaosihfas"asdfojasfgohjasd" -> invalid. make sure to handle
 		start := i
-
 		if value_bytes[start] == DQUOTE {
 			// look for the matching "
 			i++
@@ -88,16 +86,15 @@ func splitHeaderValues(value_bytes []byte) ([][]byte, error) {
 				return nil, &errors.ErrInvalidHeader{}
 			}
 		} else {
-			for i < size {
-				if value_bytes[i] == COMMA {
-					values_list_bytes = append(values_list_bytes, value_bytes[start:i])
-					break
-				}
+			for i < size && value_bytes[i] != COMMA {
 				i++
+
+				// not proper quoted string
+				if value_bytes[i] == DQUOTE {
+					return nil, &errors.ErrInvalidHeader{}
+				}
 			}
-			if i == size {
-				values_list_bytes = append(values_list_bytes, value_bytes[start:i])
-			}
+			values_list_bytes = append(values_list_bytes, value_bytes[start:i])
 		}
 	}
 
@@ -113,9 +110,18 @@ func processHeaderValues(value_bytes *[]byte) ([][]byte, error) {
 	values_list := make([][]byte, 0)
 	for _, value := range values_list_bytes {
 		trimmed := bytes.TrimSpace(value)
+		// Empty elements do not contribute to the count of elements present.
+		// RFC9110 5.6.1.2
 		if len(trimmed) != 0 {
 			values_list = append(values_list_bytes, trimmed)
 		}
+	}
+	/*
+		at least one non-empty element is required
+		RFC9110 5.6.1.2
+	*/
+	if len(values_list) == 0 {
+		return nil, &errors.ErrInvalidHeader{}
 	}
 
 	return values_list, nil
