@@ -69,7 +69,7 @@ func (server *Server) processConnection(conn net.Conn) {
 		res = server.router.RouteRequest(request)
 	}
 
-	conn.Write([]byte(res.String()))
+	conn.Write(res.Bytes())
 }
 
 // Initializes the server, listens for incoming connections,
