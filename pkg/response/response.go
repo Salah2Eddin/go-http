@@ -27,7 +27,7 @@ func (res Response) String() string {
 	line_bytes := res.Line.String()
 	header_bytes := res.Headers.String()
 
-	return line_bytes + header_bytes + string(*res.Body)
+	return line_bytes + header_bytes + "\r\n" + string(*res.Body)
 }
 
 func (res Response) Bytes() []byte {
@@ -37,6 +37,10 @@ func (res Response) Bytes() []byte {
 	bytes := make([]byte, 0)
 	bytes = append(bytes, line_bytes...)
 	bytes = append(bytes, header_bytes...)
+
+	// empty line between headers and body
+	bytes = append(bytes, []byte("\r\n")...)
+
 	bytes = append(bytes, *res.Body...)
 
 	return bytes

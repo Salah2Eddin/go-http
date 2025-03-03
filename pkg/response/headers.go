@@ -27,6 +27,5 @@ func (headers ResponseHeaders) String() string {
 		header := fmt.Sprintf("%s:%s\r\n", k, v)
 		headers_str += header
 	}
-	headers_str += "\r\n"
 	return headers_str
 }
