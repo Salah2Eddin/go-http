@@ -30,6 +30,6 @@ func (req *Request) Version() string {
 	return req.line.Version
 }
 
-func (req *Request) GetHeader(header string) (string, bool) {
+func (req *Request) GetHeader(header string) ([]string, bool) {
 	return req.headers.Get(header)
 }

@@ -48,9 +48,77 @@ func processHeaderName(name_bytes *[]byte) []byte {
 	return processed_bytes
 }
 
-func processHeaderValue(value_bytes *[]byte) []byte {
-	trimmed_bytes := bytes.TrimSpace(*value_bytes)
-	return trimmed_bytes
+func splitHeaderValues(value_bytes []byte) ([][]byte, error) {
+	COMMA := byte(0x2C)
+	DQUOTE := byte(0x22)
+	BSLASH := byte(0x5C)
+
+	size := len(value_bytes)
+
+	values_list_bytes := make([][]byte, 0)
+
+	for i := 0; i < size; i++ {
+		if util.IsWhiteSpaceASCII(value_bytes[i]) {
+			continue
+		}
+
+		// asfaosihfas"asdfojasfgohjasd" -> invalid. make sure to handle
+		start := i
+
+		if value_bytes[start] == DQUOTE {
+			// look for the matching "
+			i++
+			for i < size && value_bytes[i] != DQUOTE {
+				i++
+				// \" is allowed, so just skip whatever after \
+				if value_bytes[i] == BSLASH {
+					i++
+				}
+			}
+			if value_bytes[i] == DQUOTE {
+				// take all inbetween quotes except empty spaces
+				values_list_bytes = append(values_list_bytes, value_bytes[start:i+1])
+
+				// skip until comma
+				for i < size && value_bytes[i] != COMMA {
+					i++
+				}
+			} else {
+				// unmatched "
+				return nil, &errors.ErrInvalidHeader{}
+			}
+		} else {
+			for i < size {
+				if value_bytes[i] == COMMA {
+					values_list_bytes = append(values_list_bytes, value_bytes[start:i])
+					break
+				}
+				i++
+			}
+			if i == size {
+				values_list_bytes = append(values_list_bytes, value_bytes[start:i])
+			}
+		}
+	}
+
+	return values_list_bytes, nil
+}
+
+func processHeaderValues(value_bytes *[]byte) ([][]byte, error) {
+	values_list_bytes, err := splitHeaderValues(*value_bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	values_list := make([][]byte, 0)
+	for _, value := range values_list_bytes {
+		trimmed := bytes.TrimSpace(value)
+		if len(trimmed) != 0 {
+			values_list = append(values_list_bytes, trimmed)
+		}
+	}
+
+	return values_list, nil
 }
 
 func nameValueSplit(header_line_bytes *[]byte) ([]byte, []byte, bool) {
@@ -60,19 +128,26 @@ func nameValueSplit(header_line_bytes *[]byte) ([]byte, []byte, bool) {
 	return bytes.Cut(*header_line_bytes, []byte{COLON})
 }
 
-func parseHeaderLine(b *[]byte) (string, string, error) {
+func parseHeaderLine(b *[]byte) (string, []string, error) {
 	name_bytes, value_bytes, found := nameValueSplit(b)
 	if !found || !validHeaderName(&name_bytes) || !validHeaderValue(&value_bytes) {
-		return "", "", errors.ErrInvalidHeader{}
+		return "", []string{}, errors.ErrInvalidHeader{}
 	}
 
 	// header name
 	name := string(processHeaderName(&name_bytes))
 
 	// header value
-	value := string(processHeaderValue(&value_bytes))
+	values_list_bytes, err := processHeaderValues(&value_bytes)
+	if err != nil {
+		return "", []string{}, errors.ErrInvalidHeader{}
+	}
+	values_list := make([]string, 0)
+	for _, v := range values_list_bytes {
+		values_list = append(values_list, string(v))
+	}
 
-	return name, value, nil
+	return name, values_list, nil
 }
 
 func parseRequestHeaders(lines *[]*[]byte) (*request.RequestHeaders, error) {

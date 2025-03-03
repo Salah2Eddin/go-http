@@ -12,7 +12,7 @@ func index(request *request.Request) *response.Response {
 	status := statuscodes.Status200()
 
 	headers := response.NewResponseHeaders()
-	headers.Set("content-type", "text/html")
+	headers.Add("content-type", "text/html")
 
 	var body []byte
 	if name, exists := request.GetUriParameter("name"); exists {

@@ -11,7 +11,7 @@ func GET(request *request.Request) *response.Response {
 	status := statuscodes.Status200()
 
 	headers := response.NewResponseHeaders()
-	headers.Set("content-type", "text/plain")
+	headers.Add("content-type", "text/plain")
 
 	body := []byte("Hello World!")
 
