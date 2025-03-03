@@ -26,7 +26,7 @@ func checkHeadersEnd(bytes *[]byte) bool {
 func readLine(reader *bufio.Reader) (*[]byte, error) {
 	var line_bytes []byte
 
-	for checkCRLF(&line_bytes) {
+	for !checkCRLF(&line_bytes) {
 		next, err := reader.ReadByte()
 		if err != nil {
 			return nil, err
@@ -71,7 +71,8 @@ func ParseRequest(reader *bufio.Reader) (*request.Request, error) {
 
 	// request body
 	var request_body []byte
-	if length_str, exists := request_headers.Get("content-length"); exists {
+	if length_header, exists := request_headers.Get("content-length"); exists {
+		length_str := length_header[0]
 		length, err := strconv.Atoi(length_str)
 		if err != nil {
 			return &request.Request{}, err
