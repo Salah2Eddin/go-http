@@ -12,11 +12,6 @@ const (
 	AsciiDelete     = 0x7F
 )
 
-// isInRange checks whether the given byte falls between the specified minimum and maximum (inclusive).
-func isInRange(b, min, max byte) bool {
-	return b >= min && b <= max
-}
-
 // IsVisibleASCII determines if a given byte represents a visible ASCII character.
 func IsVisibleASCII(b byte) bool {
 	return isInRange(b, AsciiVisibleMin, AsciiVisibleMax)
