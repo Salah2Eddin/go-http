@@ -21,16 +21,6 @@ func IsSubDelim(b byte) bool {
 	}
 }
 
-// IsGenDelim checks if a character is a gen-delimiter in URIs
-func IsGenDelim(b byte) bool {
-	switch b {
-	case ':', '/', '?', '#', '[', ']', '@':
-		return true
-	default:
-		return false
-	}
-}
-
 // IsPChar checks if a character is a pchar (path character) in URIs
 func IsPChar(b byte) bool {
 	return IsUnreserved(b) || IsSubDelim(b) || b == ':' || b == '@'
