@@ -45,3 +45,8 @@ func IsSchemeChar(b byte) bool {
 		return IsAlphaNum(b)
 	}
 }
+
+// IsUserInfoChar checks if a character is valid in a URI userinfo.
+func IsUserInfoChar(b byte) bool {
+	return IsUnreserved(b) || IsSubDelim(b) || b == ':' || b == '%'
+}

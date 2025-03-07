@@ -11,7 +11,7 @@ import (
 func index(request request.Request) response.Response {
 	status := statuscodes.Status200()
 
-	id := request.Uri().GetPath()[2]
+	id := request.Uri().GetSegments()[2]
 
 	headers := response.NewResponseHeaders()
 	headers.Add("content-type", "text/html")

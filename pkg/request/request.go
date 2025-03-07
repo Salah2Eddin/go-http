@@ -21,7 +21,7 @@ func (req *Request) Uri() uri.Uri {
 }
 
 func (req *Request) GetUriParameter(param string) (string, bool) {
-	return req.line.Uri.GetParameter(param)
+	return req.line.Uri.GetQueryParameter(param)
 }
 
 func (req *Request) Method() string {

@@ -42,11 +42,18 @@ func parseRequestLine(requestLineBytes []byte) (request.Line, error) {
 		return request.Line{}, pkgerrors.ErrInvalidRequestLine{}
 	}
 
-	uriObj := uri.NewUri(parts[1])
+	method := parts[0]
+	uriString := parts[1]
+	httpVer := parts[2]
 
+	if !uri.ValidateURI(uriString) {
+		return request.Line{}, &pkgerrors.ErrInvalidUri{Uri: uriString}
+	}
+
+	uriObj := uri.NewUri(uriString)
 	return request.NewRequestLine(
-		parts[0], // method
+		method, // method
 		uriObj,
-		parts[2], // http version
+		httpVer, // http version
 	), nil
 }
