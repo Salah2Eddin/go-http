@@ -17,7 +17,7 @@ func validHeaderName(name_bytes *[]byte) bool {
 		}
 
 		// No whitespace is allowed between the field(header) name and colon (RFC9112 5.1)
-		if v == WHITE_SPACE {
+		if util.IsWhiteSpaceASCII(v) {
 			return false
 		}
 	}
