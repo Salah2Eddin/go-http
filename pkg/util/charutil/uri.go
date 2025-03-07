@@ -31,11 +31,6 @@ func IsGenDelim(b byte) bool {
 	}
 }
 
-// IsReserved checks if a character is a reserved character in URIs
-func IsReserved(b byte) bool {
-	return IsGenDelim(b) || IsSubDelim(b)
-}
-
 // IsPChar checks if a character is a pchar (path character) in URIs
 func IsPChar(b byte) bool {
 	return IsUnreserved(b) || IsSubDelim(b) || b == ':' || b == '@'
