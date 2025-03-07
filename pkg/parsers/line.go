@@ -1,7 +1,7 @@
 package parsers
 
 import (
-	"ducky/http/pkg/errors"
+	"ducky/http/pkg/pkgerrors"
 	"ducky/http/pkg/request"
 	"ducky/http/pkg/uri"
 	"ducky/http/pkg/util"
@@ -31,7 +31,7 @@ func parseRequestLine(requestLineBytes []byte) (request.Line, error) {
 
 	// Request line must contain bytes in the ASCII range only (RFC9112 2.2)
 	if !validateAsciiEncoding(requestLineBytes) {
-		return request.Line{}, errors.ErrInvalidRequestLine{}
+		return request.Line{}, pkgerrors.ErrInvalidRequestLine{}
 	}
 
 	requestLine := string(requestLineBytes)
@@ -39,7 +39,7 @@ func parseRequestLine(requestLineBytes []byte) (request.Line, error) {
 	parts := strings.Fields(requestLine)
 
 	if !validRequestLine(parts) {
-		return request.Line{}, errors.ErrInvalidRequestLine{}
+		return request.Line{}, pkgerrors.ErrInvalidRequestLine{}
 	}
 
 	uriObj := uri.NewUri(parts[1])

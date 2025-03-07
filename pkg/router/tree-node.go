@@ -1,7 +1,7 @@
 package router
 
 import (
-	"ducky/http/pkg/errors"
+	"ducky/http/pkg/pkgerrors"
 )
 
 const wildcardHash = -1
@@ -20,7 +20,7 @@ type routerTreeNode struct {
 
 func (node *routerTreeNode) addChild(hash int, child *routerTreeNode) error {
 	if _, exists := node.children[hash]; exists {
-		return &errors.ErrRouteExists{}
+		return &pkgerrors.ErrRouteExists{}
 	}
 	node.children[hash] = child
 	return nil
@@ -28,7 +28,7 @@ func (node *routerTreeNode) addChild(hash int, child *routerTreeNode) error {
 
 func (node *routerTreeNode) addWildcardChild(child *routerTreeNode) error {
 	if _, exists := node.children[wildcardHash]; exists {
-		return &errors.ErrRouteExists{Route: "*"}
+		return &pkgerrors.ErrRouteExists{Route: "*"}
 	}
 	node.children[wildcardHash] = child
 	return nil

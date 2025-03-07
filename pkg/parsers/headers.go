@@ -2,7 +2,7 @@ package parsers
 
 import (
 	"bytes"
-	"ducky/http/pkg/errors"
+	"ducky/http/pkg/pkgerrors"
 	"ducky/http/pkg/request"
 	"ducky/http/pkg/util"
 )
@@ -80,13 +80,13 @@ func splitHeaderValues(valueBytes []byte) ([][]byte, error) {
 				}
 			} else {
 				// unmatched "
-				return nil, &errors.ErrInvalidHeader{}
+				return nil, &pkgerrors.ErrInvalidHeader{}
 			}
 		} else {
 			for i < size && valueBytes[i] != COMMA {
 				// not proper quoted string
 				if valueBytes[i] == DQUOTE {
-					return nil, &errors.ErrInvalidHeader{}
+					return nil, &pkgerrors.ErrInvalidHeader{}
 				}
 				i++
 			}
@@ -117,7 +117,7 @@ func processHeaderValues(valueBytes []byte) ([][]byte, error) {
 		RFC9110 5.6.1.2
 	*/
 	if len(valuesList) == 0 {
-		return nil, &errors.ErrInvalidHeader{}
+		return nil, &pkgerrors.ErrInvalidHeader{}
 	}
 
 	return valuesList, nil
@@ -133,7 +133,7 @@ func nameValueSplit(headerLineBytes []byte) ([]byte, []byte, bool) {
 func parseHeaderLine(headerLineBytes []byte) (string, []string, error) {
 	nameBytes, valueBytes, found := nameValueSplit(headerLineBytes)
 	if !found || !validHeaderName(nameBytes) || !validHeaderValue(valueBytes) {
-		return "", []string{}, errors.ErrInvalidHeader{}
+		return "", []string{}, pkgerrors.ErrInvalidHeader{}
 	}
 
 	// header name
@@ -142,7 +142,7 @@ func parseHeaderLine(headerLineBytes []byte) (string, []string, error) {
 	// header value
 	valuesListBytes, err := processHeaderValues(valueBytes)
 	if err != nil {
-		return "", []string{}, errors.ErrInvalidHeader{}
+		return "", []string{}, pkgerrors.ErrInvalidHeader{}
 	}
 	valuesList := make([]string, 0)
 	for _, v := range valuesListBytes {

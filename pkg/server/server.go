@@ -2,8 +2,8 @@ package server
 
 import (
 	"bufio"
-	"ducky/http/pkg/errors"
 	"ducky/http/pkg/parsers"
+	"ducky/http/pkg/pkgerrors"
 	"ducky/http/pkg/response"
 	"ducky/http/pkg/response/statuscodes"
 	"ducky/http/pkg/router"
@@ -53,7 +53,7 @@ func (server *Server) AddHandler(uriStr string, method string, handler router.Ha
 // based on the type of error encountered.
 func mapErrorToStatusCode(err error) response.StatusLine {
 	switch err.(type) {
-	case errors.ErrInvalidHeader, errors.ErrInvalidRequestLine:
+	case pkgerrors.ErrInvalidHeader, pkgerrors.ErrInvalidRequestLine:
 		return statuscodes.Status400()
 	default:
 		return statuscodes.Status500()

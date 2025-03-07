@@ -1,7 +1,7 @@
 package router
 
 import (
-	"ducky/http/pkg/errors"
+	"ducky/http/pkg/pkgerrors"
 	"ducky/http/pkg/uri"
 )
 
@@ -46,7 +46,7 @@ func (tree *RoutesTree) find(uri uri.Uri, allowWildcard bool) (int, error) {
 				next = current.wildcard()
 			}
 			if next == nil {
-				return routeNotFoundID, errors.ErrRouteNotFound{}
+				return routeNotFoundID, pkgerrors.ErrRouteNotFound{}
 			}
 		}
 		current = next
