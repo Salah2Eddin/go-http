@@ -21,6 +21,7 @@ func validRequestLine(parts []string) bool {
 func validateAsciiEncoding(bytes *[]byte) bool {
 	for _, v := range *bytes {
 		if !util.IsUSASCII(v) {
+		if !util.IsASCII(v) {
 			return false
 		}
 	}
@@ -32,6 +33,7 @@ func parseRequestLine(request_line_bytes *[]byte) (*request.RequestLine, error) 
 	// Request line must contain bytes in the USASCII range only (RFC9112 2.2)
 	if !validateAsciiEncoding(request_line_bytes) {
 		return &request.RequestLine{}, errors.ErrInvalidRequestLine{}
+	// Request line must contain bytes in the ASCII range only (RFC9112 2.2)
 	}
 
 	request_line := string(*request_line_bytes)

@@ -12,6 +12,7 @@ func validHeaderName(name_bytes *[]byte) bool {
 
 	for _, v := range *name_bytes {
 		if !util.IsVisiableUSASCII(v) {
+		if !util.IsVisibleASCII(v) {
 			return false
 		}
 
