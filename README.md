@@ -46,7 +46,7 @@ package main
 import (
 	  "ducky/http/pkg/request"
 	  "ducky/http/pkg/response"
-	  statuscodes "ducky/http/pkg/response/statuscodes"
+	  "ducky/http/pkg/response/statuscodes"
 	  "ducky/http/pkg/server"
 )
 
@@ -54,7 +54,7 @@ func index(request *request.Request) *response.Response {
     status := statuscodes.Status200()
 
     headers := response.NewResponseHeaders()
-    headers.Set("content-type", "text/html")
+    headers.Add("content-type", "text/html")
 
     body := []byte("<h1>Hello, World!</h1>")
 
@@ -62,9 +62,9 @@ func index(request *request.Request) *response.Response {
 }
 
 func main() {
-    server := server.NewServer(&server.ServerAddress{Ip: "127.0.0.1", Port: "8008"})
-    server.AddHandler("/", "GET", index)
-    server.Start()
+    app := server.NewServer(&server.Address{IP: "127.0.0.1", Port: "8008"})
+	app.AddHandler("/", "GET", index)
+	app.Start()
 }
 ```
 
