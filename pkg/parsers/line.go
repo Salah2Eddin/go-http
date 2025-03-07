@@ -44,11 +44,11 @@ func parseRequestLine(request_line_bytes *[]byte) (*request.RequestLine, error) 
 		return &request.RequestLine{}, errors.ErrInvalidRequestLine{}
 	}
 
-	uri := uri.NewUri(parts[1])
+	uriObj := uri.NewUri(parts[1])
 
 	return request.NewRequestLine(
 		parts[0], // method
-		uri,
+		uriObj,
 		parts[2], // http version
 	), nil
 }
