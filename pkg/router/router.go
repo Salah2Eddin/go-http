@@ -4,39 +4,46 @@ import (
 	"ducky/http/pkg/request"
 	"ducky/http/pkg/response"
 	"ducky/http/pkg/response/statuscodes"
+	"ducky/http/pkg/uri"
 )
 
 type Router struct {
-	routes map[string]*route
+	routes map[int]Route
+	tree   RoutesTree
 }
 
-func NewRouter() *Router {
-	router := Router{}
-	router.routes = make(map[string]*route)
-	return &router
+func NewRouter() Router {
+	router := Router{
+		routes: make(map[int]Route),
+		tree:   NewRoutesTree(),
+	}
+	return router
 }
 
-func (router *Router) AddRoute(uri string, route *route) {
-	router.routes[uri] = route
-}
-
-func (router *Router) NewRoute(uri string) *route {
+func (router *Router) NewRoute(uri uri.Uri) (Route, error) {
 	route := newRoute()
-	router.routes[uri] = route
-	return route
+	id, err := router.tree.addRoute(uri)
+	if err != nil {
+		return Route{}, err
+	}
+	router.routes[id] = route
+	return route, nil
 }
 
-func (router *Router) GetRoute(uri string) (*route, bool) {
-	route, exists := router.routes[uri]
-	return route, exists
+func (router *Router) GetRoute(uri uri.Uri, allowWildcard bool) (Route, error) {
+	id, err := router.tree.find(uri, allowWildcard)
+	if err != nil {
+		return Route{}, err
+	}
+	// at this point, a route with id is guaranteed to exist
+	return router.routes[id], nil
 }
 
-func (router *Router) RouteRequest(request *request.Request) *response.Response {
-	uri := request.Uri()
-	route, exists := router.routes[uri]
-	if !exists {
+func (router *Router) RouteRequest(request request.Request) response.Response {
+	route, err := router.GetRoute(request.Uri(), true)
+	if err != nil {
 		return response.NewEmptyResponse(statuscodes.Status404())
 	}
-	response := route.handle(request)
-	return response
+	resp := route.handle(request)
+	return resp
 }

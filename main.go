@@ -8,8 +8,10 @@ import (
 	"fmt"
 )
 
-func index(request *request.Request) *response.Response {
+func index(request request.Request) response.Response {
 	status := statuscodes.Status200()
+
+	id := request.Uri().GetPath()[2]
 
 	headers := response.NewResponseHeaders()
 	headers.Add("content-type", "text/html")
@@ -21,11 +23,13 @@ func index(request *request.Request) *response.Response {
 		body = []byte("<h1>Hello, World!</h1>")
 	}
 
+	body = append(body, []byte(fmt.Sprintf("<h1>Your ID is %s</h1>", id))...)
+
 	return response.NewResponse(status, headers, &body)
 }
 
 func main() {
-	server := server.NewServer(&server.ServerAddress{Ip: "127.0.0.1", Port: "8008"})
-	server.AddHandler("/", "GET", index)
-	server.Start()
+	app := server.NewServer(&server.Address{IP: "127.0.0.1", Port: "8008"})
+	app.AddHandler("/id/*", "GET", index)
+	app.Start()
 }

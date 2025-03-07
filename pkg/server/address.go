@@ -1,10 +1,10 @@
 package server
 
-type ServerAddress struct {
-	Ip   string
+type Address struct {
+	IP   string
 	Port string
 }
 
-func (addr *ServerAddress) String() string {
-	return addr.Ip + ":" + addr.Port
+func (addr *Address) String() string {
+	return addr.IP + ":" + addr.Port
 }

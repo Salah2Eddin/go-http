@@ -7,11 +7,8 @@ import (
 	"ducky/http/pkg/util"
 )
 
-func validHeaderName(name_bytes *[]byte) bool {
-	WHITE_SPACE := byte(0x20)
-
-	for _, v := range *name_bytes {
-		if !util.IsVisiableUSASCII(v) {
+func validHeaderName(nameBytes []byte) bool {
+	for _, v := range nameBytes {
 		if !util.IsVisibleASCII(v) {
 			return false
 		}
@@ -24,8 +21,8 @@ func validHeaderName(name_bytes *[]byte) bool {
 	return true
 }
 
-func validHeaderValue(value_bytes *[]byte) bool {
-	for _, v := range *value_bytes {
+func validHeaderValue(valueBytes []byte) bool {
+	for _, v := range valueBytes {
 		/*
 			a recipient of CR, LF, or NUL within a field value
 			MUST either reject the message or replace each of those characters with SP.
@@ -41,45 +38,44 @@ func validHeaderValue(value_bytes *[]byte) bool {
 	return true
 }
 
-func processHeaderName(name_bytes *[]byte) []byte {
-	// lowercase to gurantee case insensitivity
-	processed_bytes := bytes.ToLower(*name_bytes)
-	processed_bytes = bytes.TrimSpace(processed_bytes)
+func processHeaderName(nameBytes []byte) []byte {
+	// lowercase to guarantee case insensitivity
+	processedBytes := bytes.ToLower(nameBytes)
+	processedBytes = bytes.TrimSpace(processedBytes)
 
-	return processed_bytes
+	return processedBytes
 }
 
-func splitHeaderValues(value_bytes []byte) ([][]byte, error) {
+func splitHeaderValues(valueBytes []byte) ([][]byte, error) {
 	COMMA := byte(0x2C)
 	DQUOTE := byte(0x22)
 	BSLASH := byte(0x5C)
 
-	size := len(value_bytes)
+	size := len(valueBytes)
 
-	values_list_bytes := make([][]byte, 0)
+	valuesListBytes := make([][]byte, 0)
 
 	for i := 0; i < size; i++ {
-		if util.IsWhiteSpaceASCII(value_bytes[i]) {
+		if util.IsWhiteSpaceASCII(valueBytes[i]) {
 			continue
 		}
 
 		start := i
-		if value_bytes[start] == DQUOTE {
+		if valueBytes[start] == DQUOTE {
 			// look for the matching "
 			i++
-			for i < size && value_bytes[i] != DQUOTE {
-				i++
+			for i < size && valueBytes[i] != DQUOTE {
 				// \" is allowed, so just skip whatever after \
-				if value_bytes[i] == BSLASH {
+				if valueBytes[i] == BSLASH {
 					i++
 				}
+				i++
 			}
-			if value_bytes[i] == DQUOTE {
-				// take all inbetween quotes except empty spaces
-				values_list_bytes = append(values_list_bytes, value_bytes[start:i+1])
+			if valueBytes[i] == DQUOTE {
+				valuesListBytes = append(valuesListBytes, valueBytes[start:i+1])
 
 				// skip until comma
-				for i < size && value_bytes[i] != COMMA {
+				for i < size && valueBytes[i] != COMMA {
 					i++
 				}
 			} else {
@@ -87,84 +83,83 @@ func splitHeaderValues(value_bytes []byte) ([][]byte, error) {
 				return nil, &errors.ErrInvalidHeader{}
 			}
 		} else {
-			for i < size && value_bytes[i] != COMMA {
-				i++
-
+			for i < size && valueBytes[i] != COMMA {
 				// not proper quoted string
-				if value_bytes[i] == DQUOTE {
+				if valueBytes[i] == DQUOTE {
 					return nil, &errors.ErrInvalidHeader{}
 				}
+				i++
 			}
-			values_list_bytes = append(values_list_bytes, value_bytes[start:i])
+			valuesListBytes = append(valuesListBytes, valueBytes[start:i])
 		}
 	}
 
-	return values_list_bytes, nil
+	return valuesListBytes, nil
 }
 
-func processHeaderValues(value_bytes *[]byte) ([][]byte, error) {
-	values_list_bytes, err := splitHeaderValues(*value_bytes)
+func processHeaderValues(valueBytes []byte) ([][]byte, error) {
+	valuesListBytes, err := splitHeaderValues(valueBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	values_list := make([][]byte, 0)
-	for _, value := range values_list_bytes {
+	valuesList := make([][]byte, 0)
+	for _, value := range valuesListBytes {
 		trimmed := bytes.TrimSpace(value)
 		// Empty elements do not contribute to the count of elements present.
 		// RFC9110 5.6.1.2
 		if len(trimmed) != 0 {
-			values_list = append(values_list_bytes, trimmed)
+			valuesList = append(valuesListBytes, trimmed)
 		}
 	}
 	/*
 		at least one non-empty element is required
 		RFC9110 5.6.1.2
 	*/
-	if len(values_list) == 0 {
+	if len(valuesList) == 0 {
 		return nil, &errors.ErrInvalidHeader{}
 	}
 
-	return values_list, nil
+	return valuesList, nil
 }
 
-func nameValueSplit(header_line_bytes *[]byte) ([]byte, []byte, bool) {
+func nameValueSplit(headerLineBytes []byte) ([]byte, []byte, bool) {
 	// COLON splits header into key and value
 	COLON := byte(0x3A)
 
-	return bytes.Cut(*header_line_bytes, []byte{COLON})
+	return bytes.Cut(headerLineBytes, []byte{COLON})
 }
 
-func parseHeaderLine(b *[]byte) (string, []string, error) {
-	name_bytes, value_bytes, found := nameValueSplit(b)
-	if !found || !validHeaderName(&name_bytes) || !validHeaderValue(&value_bytes) {
+func parseHeaderLine(headerLineBytes []byte) (string, []string, error) {
+	nameBytes, valueBytes, found := nameValueSplit(headerLineBytes)
+	if !found || !validHeaderName(nameBytes) || !validHeaderValue(valueBytes) {
 		return "", []string{}, errors.ErrInvalidHeader{}
 	}
 
 	// header name
-	name := string(processHeaderName(&name_bytes))
+	name := string(processHeaderName(nameBytes))
 
 	// header value
-	values_list_bytes, err := processHeaderValues(&value_bytes)
+	valuesListBytes, err := processHeaderValues(valueBytes)
 	if err != nil {
 		return "", []string{}, errors.ErrInvalidHeader{}
 	}
-	values_list := make([]string, 0)
-	for _, v := range values_list_bytes {
-		values_list = append(values_list, string(v))
+	valuesList := make([]string, 0)
+	for _, v := range valuesListBytes {
+		valuesList = append(valuesList, string(v))
 	}
 
-	return name, values_list, nil
+	return name, valuesList, nil
 }
 
-func parseRequestHeaders(lines *[]*[]byte) (*request.RequestHeaders, error) {
+func parseRequestHeaders(lines *[][]byte) (request.Headers, error) {
 	headers := request.NewRequestHeaders()
 	for _, line := range *lines {
-		trimmed_line := bytes.TrimSpace(*line)
+		trimmedLine := bytes.TrimSpace(line)
 
-		name, value, err := parseHeaderLine(&trimmed_line)
+		name, value, err := parseHeaderLine(trimmedLine)
 		if err != nil {
-			return &request.RequestHeaders{}, err
+			return request.Headers{}, err
 		}
 		headers.Set(name, value)
 	}

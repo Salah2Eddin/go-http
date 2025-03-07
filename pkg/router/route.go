@@ -6,31 +6,31 @@ import (
 	"ducky/http/pkg/response/statuscodes"
 )
 
-type Handler func(request *request.Request) *response.Response
+type Handler func(request request.Request) response.Response
 
-type route struct {
-	method_handlers map[string]Handler
+type Route struct {
+	methodHandlers map[string]Handler
 }
 
-func newRoute() *route {
-	route := route{}
-	route.method_handlers = make(map[string]Handler)
-	return &route
+func newRoute() Route {
+	route := Route{}
+	route.methodHandlers = make(map[string]Handler)
+	return route
 }
 
-func (route *route) AddHandler(method string, handler Handler) {
-	route.method_handlers[method] = handler
+func (route *Route) AddHandler(method string, handler Handler) {
+	route.methodHandlers[method] = handler
 }
 
-func (route *route) handle(request *request.Request) *response.Response {
+func (route *Route) handle(request request.Request) response.Response {
 	method := request.Method()
-	handler, exists := route.method_handlers[method]
+	handler, exists := route.methodHandlers[method]
 	if !exists {
 		// should be Error 405 but it wasn't introduced in HTTP/1.0
 		// so i settled with error 400 instead
 		return response.NewEmptyResponse(statuscodes.Status400())
 	}
 
-	response := handler(request)
-	return response
+	resp := handler(request)
+	return resp
 }

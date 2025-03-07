@@ -1,18 +1,18 @@
 package request
 
-type RequestHeaders struct {
+type Headers struct {
 	headers map[string][]string
 }
 
-func NewRequestHeaders() *RequestHeaders {
-	return &RequestHeaders{headers: make(map[string][]string)}
+func NewRequestHeaders() Headers {
+	return Headers{headers: make(map[string][]string)}
 }
 
-func (req *RequestHeaders) Set(name string, value []string) {
+func (req *Headers) Set(name string, value []string) {
 	req.headers[name] = value
 }
 
-func (req *RequestHeaders) Get(name string) ([]string, bool) {
+func (req *Headers) Get(name string) ([]string, bool) {
 	val, exists := req.headers[name]
 	return val, exists
 }

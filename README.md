@@ -50,7 +50,7 @@ import (
 	  "ducky/http/pkg/server"
 )
 
-func index(request *request.Request) *response.Response {
+func index(request request.Request) response.Response {
     status := statuscodes.Status200()
 
     headers := response.NewResponseHeaders()

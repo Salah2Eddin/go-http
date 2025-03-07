@@ -1,21 +1,23 @@
 package request
 
+import "ducky/http/pkg/uri"
+
 type Request struct {
-	line    *RequestLine
-	headers *RequestHeaders
+	line    Line
+	headers Headers
 	Body    *[]byte
 }
 
-func NewRequest(line *RequestLine, headers *RequestHeaders, body *[]byte) *Request {
-	return &Request{
+func NewRequest(line Line, headers Headers, body *[]byte) Request {
+	return Request{
 		line:    line,
 		headers: headers,
 		Body:    body,
 	}
 }
 
-func (req *Request) Uri() string {
-	return req.line.Uri.String()
+func (req *Request) Uri() uri.Uri {
+	return req.line.Uri
 }
 
 func (req *Request) GetUriParameter(param string) (string, bool) {

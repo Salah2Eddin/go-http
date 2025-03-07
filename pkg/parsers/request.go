@@ -7,8 +7,8 @@ import (
 	"strconv"
 )
 
-func checkCRLF(bytes *[]byte) bool {
-	size := len(*bytes)
+func checkCRLF(bytes []byte) bool {
+	size := len(bytes)
 	if size < 2 {
 		return false
 	}
@@ -16,76 +16,76 @@ func checkCRLF(bytes *[]byte) bool {
 	CL := byte(0x0D)
 	RF := byte(0x0A)
 
-	return (*bytes)[size-2] == CL && (*bytes)[size-1] == RF
+	return (bytes)[size-2] == CL && (bytes)[size-1] == RF
 }
 
-func checkHeadersEnd(bytes *[]byte) bool {
-	return len(*bytes) == 2 && checkCRLF(bytes)
+func checkHeadersEnd(bytes []byte) bool {
+	return len(bytes) == 2 && checkCRLF(bytes)
 }
 
-func readLine(reader *bufio.Reader) (*[]byte, error) {
-	var line_bytes []byte
+func readLine(reader *bufio.Reader) ([]byte, error) {
+	var lineBytes []byte
 
-	for !checkCRLF(&line_bytes) {
+	for !checkCRLF(lineBytes) {
 		next, err := reader.ReadByte()
 		if err != nil {
 			return nil, err
 		}
-		line_bytes = append(line_bytes, next)
+		lineBytes = append(lineBytes, next)
 	}
 
-	return &line_bytes, nil
+	return lineBytes, nil
 }
 
-func ParseRequest(reader *bufio.Reader) (*request.Request, error) {
+func ParseRequest(reader *bufio.Reader) (request.Request, error) {
 	// request line
-	request_line_bytes, err := readLine(reader)
+	requestLineBytes, err := readLine(reader)
 	if err != nil {
-		return &request.Request{}, err
+		return request.Request{}, err
 	}
-	request_line, err := parseRequestLine(request_line_bytes)
+	requestLine, err := parseRequestLine(requestLineBytes)
 	if err != nil {
-		return &request.Request{}, err
+		return request.Request{}, err
 	}
 
 	// request headers_bytes
-	var headers_bytes []*[]byte
+	var headersBytes [][]byte
 	for {
-		header_bytes, err := readLine(reader)
+		headerBytes, err := readLine(reader)
 		if err != nil {
-			return &request.Request{}, err
+			return request.Request{}, err
 		}
 
 		// TODO: add line folding support
 
-		if checkHeadersEnd(header_bytes) {
+		if checkHeadersEnd(headerBytes) {
 			break
 		}
-		headers_bytes = append(headers_bytes, header_bytes)
+		headersBytes = append(headersBytes, headerBytes)
 	}
 
-	request_headers, err := parseRequestHeaders(&headers_bytes)
+	requestHeaders, err := parseRequestHeaders(&headersBytes)
 	if err != nil {
-		return &request.Request{}, err
+		return request.Request{}, err
 	}
 
 	// request body
-	var request_body []byte
-	if length_header, exists := request_headers.Get("content-length"); exists {
-		length_str := length_header[0]
-		length, err := strconv.Atoi(length_str)
+	var requestBody []byte
+	if lengthHeader, exists := requestHeaders.Get("content-length"); exists {
+		lengthStr := lengthHeader[0]
+		length, err := strconv.Atoi(lengthStr)
 		if err != nil {
-			return &request.Request{}, err
+			return request.Request{}, err
 		}
 
 		// read request body as byte array.
 		// interpreting it is left to the HTTP request handler
-		request_body = make([]byte, length)
-		_, err = io.ReadFull(reader, request_body)
+		requestBody = make([]byte, length)
+		_, err = io.ReadFull(reader, requestBody)
 		if err != nil {
-			return &request.Request{}, err
+			return request.Request{}, err
 		}
 	}
-	request := request.NewRequest(request_line, request_headers, &request_body)
-	return request, nil
+	req := request.NewRequest(requestLine, requestHeaders, &requestBody)
+	return req, nil
 }

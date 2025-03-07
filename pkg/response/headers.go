@@ -5,30 +5,30 @@ import (
 	"strings"
 )
 
-type ResponseHeaders struct {
+type Headers struct {
 	headers map[string][]string
 }
 
-func NewResponseHeaders() *ResponseHeaders {
-	headers := ResponseHeaders{}
+func NewResponseHeaders() Headers {
+	headers := Headers{}
 	headers.headers = make(map[string][]string)
-	return &headers
+	return headers
 }
 
-func (h *ResponseHeaders) Add(name string, value string) {
-	if _, exists := h.headers[name]; !exists {
-		h.headers[name] = make([]string, 0)
+func (headers *Headers) Add(name string, value string) {
+	if _, exists := headers.headers[name]; !exists {
+		headers.headers[name] = make([]string, 0)
 	}
-	h.headers[name] = append(h.headers[name], value)
+	headers.headers[name] = append(headers.headers[name], value)
 }
 
-func (h *ResponseHeaders) Get(name string) ([]string, bool) {
-	val, exists := h.headers[name]
+func (headers *Headers) Get(name string) ([]string, bool) {
+	val, exists := headers.headers[name]
 	return val, exists
 }
 
-func (headers ResponseHeaders) String() string {
-	headers_str := ""
+func (headers *Headers) String() string {
+	headersStr := ""
 	for key, values := range headers.headers {
 		header := fmt.Sprintf("%s:", key)
 		for i, value := range values {
@@ -44,7 +44,11 @@ func (headers ResponseHeaders) String() string {
 			}
 		}
 		header += "\r\n"
-		headers_str += header
+		headersStr += header
 	}
-	return headers_str
+	return headersStr
+}
+
+func (headers *Headers) Bytes() []byte {
+	return []byte(headers.String())
 }

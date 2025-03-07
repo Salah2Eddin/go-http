@@ -13,14 +13,13 @@ func validRequestLine(parts []string) bool {
 		return false
 	}
 
-	http_ver := parts[2]
+	httpVer := parts[2]
 
-	return strings.HasPrefix(http_ver, "HTTP")
+	return strings.HasPrefix(httpVer, "HTTP")
 }
 
-func validateAsciiEncoding(bytes *[]byte) bool {
-	for _, v := range *bytes {
-		if !util.IsUSASCII(v) {
+func validateAsciiEncoding(bytes []byte) bool {
+	for _, v := range bytes {
 		if !util.IsASCII(v) {
 			return false
 		}
@@ -28,20 +27,19 @@ func validateAsciiEncoding(bytes *[]byte) bool {
 	return true
 }
 
-func parseRequestLine(request_line_bytes *[]byte) (*request.RequestLine, error) {
+func parseRequestLine(requestLineBytes []byte) (request.Line, error) {
 
-	// Request line must contain bytes in the USASCII range only (RFC9112 2.2)
-	if !validateAsciiEncoding(request_line_bytes) {
-		return &request.RequestLine{}, errors.ErrInvalidRequestLine{}
 	// Request line must contain bytes in the ASCII range only (RFC9112 2.2)
+	if !validateAsciiEncoding(requestLineBytes) {
+		return request.Line{}, errors.ErrInvalidRequestLine{}
 	}
 
-	request_line := string(*request_line_bytes)
-	request_line = strings.TrimSpace(request_line)
-	parts := strings.Fields(request_line)
+	requestLine := string(requestLineBytes)
+	requestLine = strings.TrimSpace(requestLine)
+	parts := strings.Fields(requestLine)
 
 	if !validRequestLine(parts) {
-		return &request.RequestLine{}, errors.ErrInvalidRequestLine{}
+		return request.Line{}, errors.ErrInvalidRequestLine{}
 	}
 
 	uriObj := uri.NewUri(parts[1])
