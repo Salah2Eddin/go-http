@@ -1,4 +1,4 @@
-package util
+package charutil
 
 const (
 	AsciiMin        = 0x00

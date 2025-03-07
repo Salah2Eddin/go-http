@@ -4,17 +4,17 @@ import (
 	"bytes"
 	"ducky/http/pkg/pkgerrors"
 	"ducky/http/pkg/request"
-	"ducky/http/pkg/util"
+	"ducky/http/pkg/util/charutil"
 )
 
 func validHeaderName(nameBytes []byte) bool {
 	for _, v := range nameBytes {
-		if !util.IsVisibleASCII(v) {
+		if !charutil.IsVisibleASCII(v) {
 			return false
 		}
 
 		// No whitespace is allowed between the field(header) name and colon (RFC9112 5.1)
-		if util.IsWhiteSpaceASCII(v) {
+		if charutil.IsWhiteSpaceASCII(v) {
 			return false
 		}
 	}
@@ -31,7 +31,7 @@ func validHeaderValue(valueBytes []byte) bool {
 			the sake of robustness when they appear within a safe context
 			RFC9110 5.5
 		*/
-		if util.IsCTLCharASCII(v) {
+		if charutil.IsCTLCharASCII(v) {
 			return false
 		}
 	}
@@ -56,7 +56,7 @@ func splitHeaderValues(valueBytes []byte) ([][]byte, error) {
 	valuesListBytes := make([][]byte, 0)
 
 	for i := 0; i < size; i++ {
-		if util.IsWhiteSpaceASCII(valueBytes[i]) {
+		if charutil.IsWhiteSpaceASCII(valueBytes[i]) {
 			continue
 		}
 

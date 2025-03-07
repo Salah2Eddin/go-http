@@ -4,7 +4,7 @@ import (
 	"ducky/http/pkg/pkgerrors"
 	"ducky/http/pkg/request"
 	"ducky/http/pkg/uri"
-	"ducky/http/pkg/util"
+	"ducky/http/pkg/util/charutil"
 	"strings"
 )
 
@@ -20,7 +20,7 @@ func validRequestLine(parts []string) bool {
 
 func validateAsciiEncoding(bytes []byte) bool {
 	for _, v := range bytes {
-		if !util.IsASCII(v) {
+		if !charutil.IsASCII(v) {
 			return false
 		}
 	}
