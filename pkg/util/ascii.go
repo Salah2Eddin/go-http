@@ -1,26 +1,38 @@
 package util
 
+const (
+	AsciiMin        = 0x00
+	AsciiMax        = 0x7F
+	AsciiVisibleMin = 0x21
+	AsciiVisibleMax = 0x7E
+	AsciiCtlMin     = 0x00
+	AsciiCtlMax     = 0x1F
+	AsciiSpace      = 0x20
+	AsciiTab        = 0x09
+	AsciiDelete     = 0x7F
+)
+
+// isInRange checks whether the given byte falls between the specified minimum and maximum (inclusive).
+func isInRange(b, min, max byte) bool {
+	return b >= min && b <= max
+}
+
+// IsVisibleASCII determines if a given byte represents a visible ASCII character.
 func IsVisibleASCII(b byte) bool {
-	/*
-		VCHAR   =  %x21-7E  ; visible (printing) characters
-		RFC5234 B.1
-	*/
-	return b >= 0x21 && b <= 0x7E
+	return isInRange(b, AsciiVisibleMin, AsciiVisibleMax)
 }
 
+// IsASCII determines whether a given byte falls within the ASCII range.
 func IsASCII(b byte) bool {
-	// ASCII ranges from 0 to 127 (dec) or 0 to 7F (hex)
-	return b <= 0x7F
+	return isInRange(b, AsciiMin, AsciiMax)
 }
 
+// IsCTLCharASCII determines if a given ASCII byte is a control character.
 func IsCTLCharASCII(b byte) bool {
-	/*
-		CTL =  %x00-1F / %x7F    ; controls
-		RFC5234 B.1
-	*/
-	return b <= 0x1F || b == 0x7F
+	return isInRange(b, AsciiCtlMin, AsciiCtlMax) || b == AsciiDelete
 }
 
+// IsWhiteSpaceASCII checks if the given byte represents an ASCII space or tab character.
 func IsWhiteSpaceASCII(b byte) bool {
-	return b == 0x20 || b == 0x09
+	return b == AsciiSpace || b == AsciiTab
 }
