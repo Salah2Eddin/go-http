@@ -33,6 +33,7 @@ func (res Response) String() string {
 func (res Response) Bytes() []byte {
 	line_bytes := []byte(res.Line.String())
 	header_bytes := []byte(res.Headers.String())
+	lineBytes := res.Line.Bytes()
 
 	bytes := make([]byte, 0)
 	bytes = append(bytes, line_bytes...)
