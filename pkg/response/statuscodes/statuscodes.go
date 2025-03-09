@@ -10,7 +10,6 @@ func newStatusLine(version, code, phrase string) response.StatusLine {
 	return status
 }
 
-// TODO: extend with HTTP1.1 Errors
 // Dont forget to actually use them
 
 // 2XX status codes
