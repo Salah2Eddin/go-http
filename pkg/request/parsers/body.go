@@ -1,0 +1,34 @@
+package parsers
+
+import (
+	"bufio"
+	"ducky/http/pkg/pkgerrors"
+	"ducky/http/pkg/request"
+	"io"
+	"strconv"
+)
+
+const (
+	contentLengthHeaderName = "content-length"
+)
+
+func getRequestBody(reader *bufio.Reader, headers request.Headers) (*[]byte, error) {
+	lengthHeader, exists := headers.Get(contentLengthHeaderName)
+	if !exists {
+		return &[]byte{}, nil
+	}
+
+	lengthString := lengthHeader[0]
+	length, err := strconv.Atoi(lengthString)
+	if err != nil {
+		return nil, &pkgerrors.ErrInvalidContentLength{Length: lengthString}
+	}
+
+	body := make([]byte, length)
+	_, err = io.ReadFull(reader, body)
+	if err != nil {
+		return nil, &pkgerrors.ErrIncorrectContentLength{Length: length}
+	}
+
+	return &body, nil
+}

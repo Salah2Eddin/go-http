@@ -1,6 +1,7 @@
 package parsers
 
 import (
+	"bufio"
 	"ducky/http/pkg/pkgerrors"
 	"ducky/http/pkg/request"
 	"ducky/http/pkg/uri"
@@ -12,10 +13,8 @@ func validRequestLine(parts []string) bool {
 	if len(parts) != 3 {
 		return false
 	}
-
 	httpVer := parts[2]
-
-	return strings.HasPrefix(httpVer, "HTTP")
+	return strings.HasPrefix(httpVer, "HTTP/")
 }
 
 func validateAsciiEncoding(bytes []byte) bool {
@@ -25,6 +24,14 @@ func validateAsciiEncoding(bytes []byte) bool {
 		}
 	}
 	return true
+}
+
+func getRequestLine(reader *bufio.Reader) (request.Line, error) {
+	requestLineBytes, err := readLine(reader)
+	if err != nil {
+		return request.Line{}, err
+	}
+	return parseRequestLine(requestLineBytes)
 }
 
 func parseRequestLine(requestLineBytes []byte) (request.Line, error) {

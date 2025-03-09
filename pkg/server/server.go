@@ -2,8 +2,8 @@ package server
 
 import (
 	"bufio"
-	"ducky/http/pkg/parsers"
 	"ducky/http/pkg/pkgerrors"
+	"ducky/http/pkg/request/parsers"
 	"ducky/http/pkg/response"
 	"ducky/http/pkg/response/statuscodes"
 	"ducky/http/pkg/router"
