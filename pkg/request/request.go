@@ -1,6 +1,8 @@
 package request
 
-import "ducky/http/pkg/uri"
+import (
+	"ducky/http/pkg/uri"
+)
 
 type Request struct {
 	line    Line
@@ -32,6 +34,7 @@ func (req *Request) Version() string {
 	return req.line.Version
 }
 
-func (req *Request) GetHeader(header string) ([]string, bool) {
-	return req.headers.Get(header)
+func (req *Request) GetHeader(name string) (Header, bool) {
+	// make it case in-sensitive
+	return req.headers.Get(name)
 }

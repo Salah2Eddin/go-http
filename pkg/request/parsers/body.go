@@ -18,7 +18,7 @@ func getRequestBody(reader *bufio.Reader, headers request.Headers) (*[]byte, err
 		return &[]byte{}, nil
 	}
 
-	lengthString := lengthHeader[0]
+	lengthString := lengthHeader.Values()[0].Value()
 	length, err := strconv.Atoi(lengthString)
 	if err != nil {
 		return nil, &pkgerrors.ErrInvalidContentLength{Length: lengthString}
