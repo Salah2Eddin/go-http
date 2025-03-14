@@ -59,3 +59,7 @@ func (h *Header) Name() string {
 func (h *Header) Values() []HeaderValue {
 	return h.values
 }
+
+func (h *Header) AddValue(value HeaderValue) {
+	h.values = append(h.values, value)
+}

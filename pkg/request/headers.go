@@ -13,6 +13,13 @@ func NewRequestHeaders() Headers {
 func (req *Headers) Add(header Header) {
 	name := header.Name()
 	name = strings.ToLower(name)
+	if h, exists := req.headers[name]; exists {
+		// header with same name exists
+		// add current header values to it
+		for _, value := range header.Values() {
+			h.AddValue(value)
+		}
+	}
 	req.headers[name] = header
 }
 
