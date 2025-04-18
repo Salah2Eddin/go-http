@@ -1,9 +1,9 @@
 package index
 
 import (
-	"ducky/http/pkg/request"
-	"ducky/http/pkg/response"
-	statuscodes "ducky/http/pkg/response/statuscodes"
+	"github.com/Salah2Eddin/go-http/pkg/request"
+	"github.com/Salah2Eddin/go-http/pkg/response"
+	statuscodes "github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
 )
 
 func GET(request *request.Request) *response.Response {

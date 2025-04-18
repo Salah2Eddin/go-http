@@ -2,9 +2,9 @@ package server
 
 import (
 	"bufio"
-	"ducky/http/pkg/parsers"
-	"ducky/http/pkg/router"
 	"fmt"
+	"github.com/Salah2Eddin/go-http/pkg/parsers"
+	"github.com/Salah2Eddin/go-http/pkg/router"
 	"net"
 	"strings"
 )

@@ -1,6 +1,6 @@
 package statuscodes
 
-import "ducky/http/pkg/response"
+import "github.com/Salah2Eddin/go-http/pkg/response"
 
 func newStatusLine(version, code, phrase string) *response.StatusLine {
 	status := response.StatusLine{}

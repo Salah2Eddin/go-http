@@ -1,8 +1,8 @@
 package parsers
 
 import (
-	"ducky/http/pkg/errors"
-	"ducky/http/pkg/request"
+	"github.com/Salah2Eddin/go-http/pkg/errors"
+	"github.com/Salah2Eddin/go-http/pkg/request"
 	"strings"
 )
 
