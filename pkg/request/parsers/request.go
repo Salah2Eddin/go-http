@@ -2,7 +2,7 @@ package parsers
 
 import (
 	"bufio"
-	"ducky/http/pkg/request"
+	"github.com/Salah2Eddin/go-http/pkg/request"
 )
 
 func ParseRequest(reader *bufio.Reader) (request.Request, error) {

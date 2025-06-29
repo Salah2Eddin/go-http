@@ -1,7 +1,7 @@
 package router
 
 import (
-	"ducky/http/pkg/pkgerrors"
+	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 )
 
 const wildcardHash = -1

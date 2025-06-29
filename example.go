@@ -8,7 +8,7 @@ import (
 	"github.com/Salah2Eddin/go-http/pkg/server"
 )
 
-func index(request *request.Request) *response.Response {
+func index(request request.Request) response.Response {
 	status := statuscodes.Status200()
 
 	id := request.Uri().GetSegments()[2]
@@ -24,8 +24,8 @@ func index(request *request.Request) *response.Response {
 	}
 
 	body = append(body, []byte(fmt.Sprintf("<h1>Your ID is %s</h1>", id))...)
-
-	return response.NewResponse(status, headers, &body)
+	resp := response.NewResponse(status, headers, &body)
+	return resp
 }
 
 func main() {

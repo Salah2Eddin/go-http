@@ -3,9 +3,9 @@ package parsers
 import (
 	"bufio"
 	"bytes"
-	"ducky/http/pkg/pkgerrors"
-	"ducky/http/pkg/request"
-	"ducky/http/pkg/util/charutil"
+	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
+	"github.com/Salah2Eddin/go-http/pkg/request"
+	"github.com/Salah2Eddin/go-http/pkg/util/charutil"
 )
 
 const (

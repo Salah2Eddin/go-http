@@ -1,8 +1,8 @@
 package router
 
 import (
-	"ducky/http/pkg/pkgerrors"
-	"ducky/http/pkg/uri"
+	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
+	"github.com/Salah2Eddin/go-http/pkg/uri"
 )
 
 const routeNotFoundID = -1
