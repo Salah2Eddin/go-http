@@ -2,12 +2,12 @@ package server
 
 import (
 	"bufio"
-	"ducky/http/pkg/pkgerrors"
-	"ducky/http/pkg/request/parsers"
-	"ducky/http/pkg/response"
-	"ducky/http/pkg/response/statuscodes"
-	"ducky/http/pkg/router"
-	"ducky/http/pkg/uri"
+	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
+	"github.com/Salah2Eddin/go-http/pkg/request/parsers"
+	"github.com/Salah2Eddin/go-http/pkg/response"
+	"github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
+	"github.com/Salah2Eddin/go-http/pkg/router"
+	"github.com/Salah2Eddin/go-http/pkg/uri"
 	"fmt"
 	"net"
 	"strings"

@@ -1,14 +1,14 @@
 package main
 
 import (
-	"ducky/http/pkg/request"
-	"ducky/http/pkg/response"
-	"ducky/http/pkg/response/statuscodes"
-	"ducky/http/pkg/server"
 	"fmt"
+	"github.com/Salah2Eddin/go-http/pkg/request"
+	"github.com/Salah2Eddin/go-http/pkg/response"
+	"github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
+	"github.com/Salah2Eddin/go-http/pkg/server"
 )
 
-func index(request request.Request) response.Response {
+func index(request *request.Request) *response.Response {
 	status := statuscodes.Status200()
 
 	id := request.Uri().GetSegments()[2]

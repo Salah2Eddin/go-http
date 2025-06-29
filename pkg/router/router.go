@@ -1,10 +1,10 @@
 package router
 
 import (
-	"ducky/http/pkg/request"
-	"ducky/http/pkg/response"
-	"ducky/http/pkg/response/statuscodes"
-	"ducky/http/pkg/uri"
+	"github.com/Salah2Eddin/go-http/pkg/request"
+	"github.com/Salah2Eddin/go-http/pkg/response"
+	"github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
+	"github.com/Salah2Eddin/go-http/pkg/uri"
 )
 
 type Router struct {
