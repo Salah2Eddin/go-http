@@ -1,7 +1,7 @@
 package request
 
 import (
-	"ducky/http/pkg/uri"
+	"github.com/Salah2Eddin/go-http/pkg/uri"
 )
 
 type Request struct {

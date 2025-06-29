@@ -1,7 +1,7 @@
 package uri
 
 import (
-	"ducky/http/pkg/util/charutil"
+	"github.com/Salah2Eddin/go-http/pkg/util/charutil"
 	"strings"
 )
 

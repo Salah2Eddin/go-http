@@ -2,8 +2,8 @@ package parsers
 
 import (
 	"bufio"
-	"ducky/http/pkg/pkgerrors"
-	"ducky/http/pkg/request"
+	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
+	"github.com/Salah2Eddin/go-http/pkg/request"
 	"io"
 	"strconv"
 )
