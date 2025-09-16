@@ -16,7 +16,7 @@ func readLine(reader *bufio.Reader) ([]byte, error) {
 		lineBytes = append(lineBytes, next)
 	}
 
-	// remove CLRF from the line
+	// remove CRLF from the line
 	lineBytes = lineBytes[:len(lineBytes)-2]
 
 	return lineBytes, nil
