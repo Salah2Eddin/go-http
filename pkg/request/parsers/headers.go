@@ -78,6 +78,10 @@ func readUnquotedValue(reader *bytes.Reader) ([]byte, error) {
 			whiteSpaces = append(whiteSpaces, b)
 		} else if b == paramSeparatorByte {
 			// ; works as a param separator outside parentheses
+			err := reader.UnreadByte()
+			if err != nil {
+				return nil, err
+			}
 			break
 		} else {
 			// trailing white spaces are ignored
