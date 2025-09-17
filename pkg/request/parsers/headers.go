@@ -3,8 +3,8 @@ package parsers
 import (
 	"bufio"
 	"bytes"
+	"github.com/Salah2Eddin/go-http/pkg/httpheader"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
-	"github.com/Salah2Eddin/go-http/pkg/request"
 	"github.com/Salah2Eddin/go-http/pkg/util/charutil"
 )
 
@@ -236,19 +236,19 @@ func splitHeaderValues(valueBytes []byte) ([][]byte, [][]byte, error) {
 	return values, params, nil
 }
 
-func processHeaderValues(valueBytes []byte) ([]request.HeaderValue, error) {
+func processHeaderValues(valueBytes []byte) ([]httpheader.HeaderValue, error) {
 	values, params, err := splitHeaderValues(valueBytes)
 	if err != nil {
 		return nil, err
 	}
-	headerValues := make([]request.HeaderValue, 0)
+	headerValues := make([]httpheader.HeaderValue, 0)
 	for i := range values {
 		// Empty elements do not contribute to the count of elements present.
 		// RFC9110 5.6.1.2
 		if len(values[i]) == 0 {
 			continue
 		}
-		value := request.NewHeaderValue(values[i], params[i])
+		value := httpheader.NewHeaderValue(values[i], params[i])
 		headerValues = append(headerValues, value)
 	}
 	/*
@@ -269,27 +269,27 @@ func nameValueSplit(headerLineBytes []byte) ([]byte, []byte, bool) {
 	return bytes.Cut(headerLineBytes, []byte{COLON})
 }
 
-func parseHeaderLine(headerLineBytes []byte) (request.Header, error) {
+func parseHeaderLine(headerLineBytes []byte) (httpheader.Header, error) {
 	nameBytes, valueBytes, found := nameValueSplit(headerLineBytes)
 	if !found || !validHeaderName(nameBytes) || !validHeaderValue(valueBytes) {
-		return request.Header{}, pkgerrors.ErrInvalidHeader{}
+		return httpheader.Header{}, pkgerrors.ErrInvalidHeader{}
 	}
 
 	name := processHeaderName(nameBytes)
 	values, err := processHeaderValues(valueBytes)
 	if err != nil {
-		return request.Header{}, pkgerrors.ErrInvalidHeader{}
+		return httpheader.Header{}, pkgerrors.ErrInvalidHeader{}
 	}
-	header := request.NewHeader(name, values)
+	header := httpheader.NewHeader(name, values)
 	return header, nil
 }
 
-func getRequestHeaders(reader *bufio.Reader) (request.Headers, error) {
+func getRequestHeaders(reader *bufio.Reader) (httpheader.Headers, error) {
 	var headersBytes [][]byte
 	for {
 		headerBytes, err := readLine(reader)
 		if err != nil {
-			return request.Headers{}, err
+			return httpheader.Headers{}, err
 		}
 
 		if checkHeadersEnd(&headerBytes) {
@@ -300,12 +300,12 @@ func getRequestHeaders(reader *bufio.Reader) (request.Headers, error) {
 	return parseRequestHeaders(&headersBytes)
 }
 
-func parseRequestHeaders(lines *[][]byte) (request.Headers, error) {
-	headers := request.NewRequestHeaders()
+func parseRequestHeaders(lines *[][]byte) (httpheader.Headers, error) {
+	headers := httpheader.NewRequestHeaders()
 	for _, line := range *lines {
 		header, err := parseHeaderLine(line)
 		if err != nil {
-			return request.Headers{}, err
+			return httpheader.Headers{}, err
 		}
 		headers.Add(header)
 	}

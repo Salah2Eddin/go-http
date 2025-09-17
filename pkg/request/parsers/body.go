@@ -2,8 +2,8 @@ package parsers
 
 import (
 	"bufio"
+	"github.com/Salah2Eddin/go-http/pkg/httpheader"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
-	"github.com/Salah2Eddin/go-http/pkg/request"
 	"io"
 	"strconv"
 )
@@ -12,7 +12,7 @@ const (
 	contentLengthHeaderName = "content-length"
 )
 
-func getRequestBody(reader *bufio.Reader, headers request.Headers) (*[]byte, error) {
+func getRequestBody(reader *bufio.Reader, headers httpheader.Headers) (*[]byte, error) {
 	lengthHeader, exists := headers.Get(contentLengthHeaderName)
 	if !exists {
 		return &[]byte{}, nil

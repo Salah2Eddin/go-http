@@ -1,4 +1,4 @@
-package request
+package httpheader
 
 import "strings"
 
@@ -14,8 +14,8 @@ func (req *Headers) Add(header Header) {
 	name := header.Name()
 	name = strings.ToLower(name)
 	if h, exists := req.headers[name]; exists {
-		// header with same name exists
-		// add current header values to it
+		// httpheader with same name exists
+		// add current httpheader values to it
 		for _, value := range header.Values() {
 			h.AddValue(value)
 		}

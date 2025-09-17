@@ -1,16 +1,17 @@
 package request
 
 import (
+	"github.com/Salah2Eddin/go-http/pkg/httpheader"
 	"github.com/Salah2Eddin/go-http/pkg/uri"
 )
 
 type Request struct {
 	line    Line
-	headers Headers
+	headers httpheader.Headers
 	Body    *[]byte
 }
 
-func NewRequest(line Line, headers Headers, body *[]byte) Request {
+func NewRequest(line Line, headers httpheader.Headers, body *[]byte) Request {
 	return Request{
 		line:    line,
 		headers: headers,
@@ -34,7 +35,7 @@ func (req *Request) Version() string {
 	return req.line.Version
 }
 
-func (req *Request) GetHeader(name string) (Header, bool) {
+func (req *Request) GetHeader(name string) (httpheader.Header, bool) {
 	// make it case in-sensitive
 	return req.headers.Get(name)
 }
