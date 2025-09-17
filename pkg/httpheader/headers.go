@@ -1,6 +1,9 @@
 package httpheader
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type Headers struct {
 	headers map[string]Header
@@ -10,21 +13,33 @@ func NewRequestHeaders() Headers {
 	return Headers{headers: make(map[string]Header)}
 }
 
-func (req *Headers) Add(header Header) {
+func (headers *Headers) Add(header Header) {
 	name := header.Name()
 	name = strings.ToLower(name)
-	if h, exists := req.headers[name]; exists {
-		// httpheader with same name exists
-		// add current httpheader values to it
+	if h, exists := headers.headers[name]; exists {
+		// header with same name exists
+		// add current header values to it
 		for _, value := range header.Values() {
 			h.AddValue(value)
 		}
 	}
-	req.headers[name] = header
+	headers.headers[name] = header
 }
 
-func (req *Headers) Get(name string) (Header, bool) {
+func (headers *Headers) Get(name string) (Header, bool) {
 	name = strings.ToLower(name)
-	val, exists := req.headers[name]
+	val, exists := headers.headers[name]
 	return val, exists
+}
+
+func (headers *Headers) String() string {
+	headersStr := ""
+	for key, header := range headers.headers {
+		headersStr += fmt.Sprintf("%s: %s\r\n", key, header.String())
+	}
+	return headersStr
+}
+
+func (headers *Headers) Bytes() []byte {
+	return []byte(headers.String())
 }

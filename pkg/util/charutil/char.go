@@ -11,6 +11,21 @@ const (
 	hexAlphaEnd        = 'f'
 	hexAlphaUpperStart = 'A'
 	hexAlphaUpperEnd   = 'F'
+	tcharExcl          = '!'  // !
+	tcharHash          = '#'  // #
+	tcharDollar        = '$'  // $
+	tcharPct           = '%'  // %
+	tcharAmp           = '&'  // &
+	tcharSQuote        = '\'' // '
+	tcharStar          = '*'  // *
+	tcharPlus          = '+'  // +
+	tcharMinus         = '-'  // -
+	tcharDot           = '.'  // .
+	tcharCaret         = '^'  // ^
+	tcharUnders        = '_'  // _
+	tcharGrave         = '`'  // `
+	tcharPipe          = '|'  // |
+	tcharTilde         = '~'  // ~
 )
 
 // IsAlpha checks if a character is an alphabetic character (a-z, A-Z)
@@ -36,4 +51,17 @@ func IsHexAlpha(b byte) bool {
 // IsHexDigit checks if a character is a hexadecimal digit (0-9, a-f, A-F)
 func IsHexDigit(b byte) bool {
 	return IsDigit(b) || IsHexAlpha(b)
+}
+
+func IsTChar(b byte) bool {
+	if IsAlphaNum(b) {
+		return true
+	}
+	switch b {
+	case tcharExcl, tcharHash, tcharDollar, tcharPct, tcharAmp,
+		tcharSQuote, tcharStar, tcharPlus, tcharMinus, tcharDot,
+		tcharCaret, tcharUnders, tcharGrave, tcharPipe, tcharTilde:
+		return true
+	}
+	return false
 }
