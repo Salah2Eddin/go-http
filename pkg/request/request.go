@@ -2,16 +2,17 @@ package request
 
 import (
 	"github.com/Salah2Eddin/go-http/pkg/httpheader"
+	"github.com/Salah2Eddin/go-http/pkg/reqline"
 	"github.com/Salah2Eddin/go-http/pkg/uri"
 )
 
 type Request struct {
-	line    Line
+	line    reqline.RequestLine
 	headers httpheader.Headers
 	Body    *[]byte
 }
 
-func NewRequest(line Line, headers httpheader.Headers, body *[]byte) Request {
+func NewRequest(line reqline.RequestLine, headers httpheader.Headers, body *[]byte) Request {
 	return Request{
 		line:    line,
 		headers: headers,

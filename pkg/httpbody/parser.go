@@ -1,4 +1,4 @@
-package parsers
+package httpbody
 
 import (
 	"bufio"
@@ -12,7 +12,7 @@ const (
 	contentLengthHeaderName = "content-length"
 )
 
-func getRequestBody(reader *bufio.Reader, headers httpheader.Headers) (*[]byte, error) {
+func GetRequestBody(reader *bufio.Reader, headers httpheader.Headers) (*[]byte, error) {
 	lengthHeader, exists := headers.Get(contentLengthHeaderName)
 	if !exists {
 		return &[]byte{}, nil

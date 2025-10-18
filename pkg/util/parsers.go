@@ -1,11 +1,23 @@
-package parsers
+package util
 
 import (
 	"bufio"
 	"bytes"
 )
 
-func readLine(reader *bufio.Reader) ([]byte, error) {
+func checkCRLF(bytes *[]byte) bool {
+	size := len(*bytes)
+	if size < 2 {
+		return false
+	}
+
+	CL := byte(0x0D)
+	RF := byte(0x0A)
+
+	return (*bytes)[size-2] == CL && (*bytes)[size-1] == RF
+}
+
+func ReadLine(reader *bufio.Reader) ([]byte, error) {
 	var lineBytes []byte
 
 	for !checkCRLF(&lineBytes) {
@@ -22,19 +34,7 @@ func readLine(reader *bufio.Reader) ([]byte, error) {
 	return lineBytes, nil
 }
 
-func checkCRLF(bytes *[]byte) bool {
-	size := len(*bytes)
-	if size < 2 {
-		return false
-	}
-
-	CL := byte(0x0D)
-	RF := byte(0x0A)
-
-	return (*bytes)[size-2] == CL && (*bytes)[size-1] == RF
-}
-
-func peek(reader *bytes.Reader) (byte, error) {
+func Peek(reader *bytes.Reader) (byte, error) {
 	b, err := reader.ReadByte()
 	if err != nil {
 		return b, err

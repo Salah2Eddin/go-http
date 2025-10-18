@@ -2,13 +2,13 @@ package server
 
 import (
 	"bufio"
+	"fmt"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
-	"github.com/Salah2Eddin/go-http/pkg/request/parsers"
+	"github.com/Salah2Eddin/go-http/pkg/request"
 	"github.com/Salah2Eddin/go-http/pkg/response"
 	"github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
 	"github.com/Salah2Eddin/go-http/pkg/router"
 	"github.com/Salah2Eddin/go-http/pkg/uri"
-	"fmt"
 	"net"
 	"strings"
 )
@@ -81,12 +81,12 @@ func (server *Server) processConnection(conn net.Conn) {
 	defer closeConn(conn)
 	reader := bufio.NewReader(conn)
 
-	request, err := parsers.ParseRequest(reader)
+	req, err := request.ParseRequest(reader)
 	var res response.Response
 	if err != nil {
 		res = response.NewEmptyResponse(mapErrorToStatusCode(err))
 	} else {
-		res = server.router.RouteRequest(request)
+		res = server.router.RouteRequest(req)
 	}
 
 	_, err = conn.Write(res.Bytes())

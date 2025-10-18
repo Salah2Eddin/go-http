@@ -1,10 +1,10 @@
-package parsers
+package reqline
 
 import (
 	"bufio"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
-	"github.com/Salah2Eddin/go-http/pkg/request"
 	"github.com/Salah2Eddin/go-http/pkg/uri"
+	"github.com/Salah2Eddin/go-http/pkg/util"
 	"github.com/Salah2Eddin/go-http/pkg/util/charutil"
 	"strings"
 )
@@ -17,28 +17,19 @@ func validRequestLine(parts []string) bool {
 	return strings.HasPrefix(httpVer, "HTTP/")
 }
 
-func validateAsciiEncoding(bytes []byte) bool {
-	for _, v := range bytes {
-		if !charutil.IsASCII(v) {
-			return false
-		}
-	}
-	return true
-}
-
-func getRequestLine(reader *bufio.Reader) (request.Line, error) {
-	requestLineBytes, err := readLine(reader)
+func GetRequestLine(reader *bufio.Reader) (RequestLine, error) {
+	requestLineBytes, err := util.ReadLine(reader)
 	if err != nil {
-		return request.Line{}, err
+		return RequestLine{}, err
 	}
 	return parseRequestLine(requestLineBytes)
 }
 
-func parseRequestLine(requestLineBytes []byte) (request.Line, error) {
+func parseRequestLine(requestLineBytes []byte) (RequestLine, error) {
 
 	// Request line must contain bytes in the ASCII range only (RFC9112 2.2)
-	if !validateAsciiEncoding(requestLineBytes) {
-		return request.Line{}, pkgerrors.ErrInvalidRequestLine{}
+	if !charutil.ValidateAsciiEncoding(requestLineBytes) {
+		return RequestLine{}, pkgerrors.ErrInvalidRequestLine{}
 	}
 
 	requestLine := string(requestLineBytes)
@@ -46,7 +37,7 @@ func parseRequestLine(requestLineBytes []byte) (request.Line, error) {
 	parts := strings.Fields(requestLine)
 
 	if !validRequestLine(parts) {
-		return request.Line{}, pkgerrors.ErrInvalidRequestLine{}
+		return RequestLine{}, pkgerrors.ErrInvalidRequestLine{}
 	}
 
 	method := parts[0]
@@ -54,11 +45,11 @@ func parseRequestLine(requestLineBytes []byte) (request.Line, error) {
 	httpVer := parts[2]
 
 	if !uri.ValidateURI(uriString) {
-		return request.Line{}, &pkgerrors.ErrInvalidUri{Uri: uriString}
+		return RequestLine{}, &pkgerrors.ErrInvalidUri{Uri: uriString}
 	}
 
 	uriObj := uri.NewUri(uriString)
-	return request.NewRequestLine(
+	return NewRequestLine(
 		method, // method
 		uriObj,
 		httpVer, // http version
