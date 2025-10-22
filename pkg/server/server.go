@@ -42,7 +42,7 @@ func (server *Server) getOrCreateRoute(uri uri.Uri) router.Route {
 	return route
 }
 
-// Registers a new handler for the given URI and HTTP method.
+// AddHandler Registers a new handler for the given URI and HTTP method.
 // If the route corresponding to the URI does not exist, a new route is created.
 func (server *Server) AddHandler(uriStr string, method string, handler router.Handler) {
 	route := server.getOrCreateRoute(uri.NewUri(uriStr))
