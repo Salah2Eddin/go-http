@@ -28,9 +28,8 @@ func (err ErrInvalidContentLength) Error() string {
 }
 
 type ErrIncorrectContentLength struct {
-	Length int
 }
 
 func (err ErrIncorrectContentLength) Error() string {
-	return fmt.Sprintf("Request body's length is not: %d", err.Length)
+	return fmt.Sprintf("Request body's length doesn't equal content-length")
 }
