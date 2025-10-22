@@ -1,10 +1,8 @@
 package reqline
 
 import (
-	"bufio"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/uri"
-	"github.com/Salah2Eddin/go-http/pkg/util"
 	"github.com/Salah2Eddin/go-http/pkg/util/charutil"
 	"strings"
 )
@@ -17,15 +15,7 @@ func validRequestLine(parts []string) bool {
 	return strings.HasPrefix(httpVer, "HTTP/")
 }
 
-func GetRequestLine(reader *bufio.Reader) (RequestLine, error) {
-	requestLineBytes, err := util.ReadLine(reader)
-	if err != nil {
-		return RequestLine{}, err
-	}
-	return parseRequestLine(requestLineBytes)
-}
-
-func parseRequestLine(requestLineBytes []byte) (RequestLine, error) {
+func ParseRequestLine(requestLineBytes []byte) (RequestLine, error) {
 
 	// Request line must contain bytes in the ASCII range only (RFC9112 2.2)
 	if !charutil.ValidateAsciiEncoding(requestLineBytes) {

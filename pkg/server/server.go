@@ -81,7 +81,7 @@ func (server *Server) processConnection(conn net.Conn) {
 	defer closeConn(conn)
 	reader := bufio.NewReader(conn)
 
-	req, err := request.ParseRequest(reader)
+	req, err := request.FromReader(reader)
 	var res response.Response
 	if err != nil {
 		res = response.NewEmptyResponse(mapErrorToStatusCode(err))

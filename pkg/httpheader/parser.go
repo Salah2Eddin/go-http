@@ -1,7 +1,6 @@
 package httpheader
 
 import (
-	"bufio"
 	"bytes"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/util"
@@ -259,7 +258,7 @@ func processHeaderValues(valueBytes []byte) ([]Value, error) {
 }
 
 func nameValueSplit(headerLineBytes []byte) ([]byte, []byte, bool) {
-	// COLON splits httpheaders into key and value
+	// COLON splits headers into key and value
 	COLON := byte(0x3A)
 
 	return bytes.Cut(headerLineBytes, []byte{COLON})
@@ -284,7 +283,7 @@ func checkHeadersEnd(bytes *[]byte) bool {
 	return len(*bytes) == 0
 }
 
-func parseRequestHeaders(lines *[][]byte) (Headers, error) {
+func ParseRequestHeaders(lines *[][]byte) (Headers, error) {
 	headers := New()
 	for _, line := range *lines {
 		header, err := parseHeaderLine(line)
@@ -295,20 +294,4 @@ func parseRequestHeaders(lines *[][]byte) (Headers, error) {
 	}
 
 	return headers, nil
-}
-
-func GetRequestHeaders(reader *bufio.Reader) (Headers, error) {
-	var headersBytes [][]byte
-	for {
-		headerBytes, err := util.ReadLine(reader)
-		if err != nil {
-			return Headers{}, err
-		}
-
-		if checkHeadersEnd(&headerBytes) {
-			break
-		}
-		headersBytes = append(headersBytes, headerBytes)
-	}
-	return parseRequestHeaders(&headersBytes)
 }
