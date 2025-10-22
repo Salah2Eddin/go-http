@@ -45,12 +45,12 @@ func (req *Request) readRequestLine(reader *bufio.Reader) error {
 }
 
 func (req *Request) readHeaders(reader *bufio.Reader) error {
-	var buf *[][]byte
-	err := httpheader.Read(reader, buf)
+	buf := make([][]byte, 0)
+	err := httpheader.Read(reader, &buf)
 	if err != nil {
 		return err
 	}
-	req.headers, err = httpheader.ParseRequestHeaders(buf)
+	req.headers, err = httpheader.ParseRequestHeaders(&buf)
 	return err
 }
 
