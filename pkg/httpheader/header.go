@@ -52,14 +52,3 @@ func (h *Header) AddValues(values []Value) {
 		h.values = append(h.values, value)
 	}
 }
-
-func (h *Header) String() string {
-	headerStr := ""
-	for _, value := range h.values {
-		if len(headerStr) != 0 {
-			headerStr += valueSeparator
-		}
-		headerStr += value.String()
-	}
-	return headerStr
-}

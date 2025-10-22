@@ -1,7 +1,6 @@
 package httpheader
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -41,14 +40,6 @@ func (headers *Headers) Get(name string) (Header, bool) {
 	return val, exists
 }
 
-func (headers *Headers) String() string {
-	headersStr := ""
-	for key, header := range headers.headers {
-		headersStr += fmt.Sprintf("%s: %s\r\n", key, header.String())
-	}
-	return headersStr
-}
-
 func (headers *Headers) Bytes() []byte {
-	return []byte(headers.String())
+	return []byte(headers.Serialize())
 }

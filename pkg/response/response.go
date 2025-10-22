@@ -27,7 +27,7 @@ func NewResponse(line StatusLine, headers httpheader.Headers, body *[]byte) Resp
 
 func (res *Response) String() string {
 	lineBytes := res.Line.String()
-	headerBytes := res.Headers.String()
+	headerBytes := res.Headers.Serialize()
 
 	return lineBytes + headerBytes + "\r\n" + string(*res.Body)
 }

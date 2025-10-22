@@ -2,8 +2,6 @@ package httpheader
 
 import (
 	"bytes"
-	"fmt"
-	"strings"
 )
 
 type Value struct {
@@ -35,46 +33,23 @@ func NewHeaderValueFromBytes(valueByte []byte, paramsBytes []byte) Value {
 	}
 }
 
-func (h *Value) Value() string {
-	return h.value
+func (v *Value) Value() string {
+	return v.value
 }
 
-func (h *Value) Params() map[string]string {
-	return h.params
+func (v *Value) Params() map[string]string {
+	return v.params
 }
 
-func (h *Value) SetParam(name, value string) {
-	h.params[name] = value
+func (v *Value) SetParam(name, value string) {
+	v.params[name] = value
 }
 
-func (h *Value) GetParam(name string) (string, bool) {
-	val, exists := h.params[name]
+func (v *Value) GetParam(name string) (string, bool) {
+	val, exists := v.params[name]
 	return val, exists
 }
 
-func (h *Value) DeleteParam(name string) {
-	delete(h.params, name)
-}
-
-func quoteString(s string) string {
-	// replace any \ with \\ and " with \"
-	s = strings.ReplaceAll(s, "\\", "\\\\")
-	s = strings.ReplaceAll(s, "\"", "\\\"")
-	return fmt.Sprintf("\"%s\"", s)
-}
-
-func formatForHeaders(s string) string {
-	if needQuotes(s) {
-		return quoteString(s)
-	}
-	return s
-}
-
-func (h *Value) String() string {
-	valueStr := formatForHeaders(h.value)
-	for key, value := range h.params {
-		valueStr += paramSeparator
-		valueStr += formatForHeaders(key) + "=" + formatForHeaders(value)
-	}
-	return valueStr
+func (v *Value) DeleteParam(name string) {
+	delete(v.params, name)
 }
