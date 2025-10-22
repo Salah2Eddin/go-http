@@ -8,14 +8,14 @@ type ISerializer interface {
 	Serialize() string
 }
 
-func serializerFactory(key string, value *Value) ISerializer {
-	var serializers = map[string]func(v *Value) ISerializer{
-		// "content-type": func(v *Value) ISerializer { return nil },
+func formatterFactory(key string) IValueFormatter {
+	var formatters = map[string]IValueFormatter{
+		"content-type": NoFormattingFormatter{},
 	}
-	if factory, ok := serializers[key]; ok {
-		return factory(value)
+	if formatter, ok := formatters[key]; ok {
+		return formatter
 	}
-	return DefaultValueSerializer{value}
+	return DefaultFormatter{}
 }
 
 func (h *Header) Serialize() string {
@@ -24,7 +24,9 @@ func (h *Header) Serialize() string {
 		if i != 0 {
 			headerStr += valueSeparator
 		}
-		headerStr += serializerFactory(h.name, &h.values[i]).Serialize()
+		formatter := formatterFactory(h.name)
+		serializer := newValueSerializer(&h.values[i], formatter)
+		headerStr += serializer.Serialize()
 	}
 	return headerStr
 }
