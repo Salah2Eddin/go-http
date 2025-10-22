@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Salah2Eddin/go-http/pkg/httpheader"
 	"github.com/Salah2Eddin/go-http/pkg/request"
 	"github.com/Salah2Eddin/go-http/pkg/response"
 	"github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
@@ -13,8 +14,8 @@ func index(request request.Request) response.Response {
 
 	id := request.Uri().GetSegments()[2]
 
-	headers := response.NewResponseHeaders()
-	headers.Add("content-type", "text/html")
+	headers := httpheader.New()
+	headers.AddFromString("content-type", "text/html")
 
 	var body []byte
 	if name, exists := request.GetUriParameter("name"); exists {
