@@ -7,13 +7,13 @@ import (
 )
 
 type IBodyReader interface {
-	read(reader *bufio.Reader, buf *[]byte) error
+	Read(reader *bufio.Reader, buf *[]byte) error
 }
 
 type BodyReader struct {
 }
 
-func (r BodyReader) read(reader *bufio.Reader, buf *[]byte) error {
+func (r BodyReader) Read(reader *bufio.Reader, buf *[]byte) error {
 	_, err := io.ReadFull(reader, *buf)
 	if err != nil {
 		return &pkgerrors.ErrIncorrectContentLength{}
