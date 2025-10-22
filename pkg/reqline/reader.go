@@ -11,6 +11,6 @@ func Read(reader *bufio.Reader, buf *[]byte) error {
 		return err
 	}
 
-	buf = &line
+	*buf = line
 	return nil
 }
