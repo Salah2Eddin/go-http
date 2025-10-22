@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"github.com/Salah2Eddin/go-http/pkg/httpheader"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
-	"io"
 	"strconv"
 )
 
@@ -24,10 +23,14 @@ func GetRequestBody(reader *bufio.Reader, headers httpheader.Headers) (*[]byte, 
 		return nil, &pkgerrors.ErrInvalidContentLength{Length: lengthString}
 	}
 
+	// TODO: Handle chunked content here
+	var bodyReader IBodyReader = nil
+	bodyReader = BodyReader{}
+
 	body := make([]byte, length)
-	_, err = io.ReadFull(reader, body)
+	err = bodyReader.read(reader, &body)
 	if err != nil {
-		return nil, &pkgerrors.ErrIncorrectContentLength{Length: length}
+		return nil, err
 	}
 
 	return &body, nil
