@@ -2,6 +2,7 @@ package httpheader
 
 import (
 	"bytes"
+
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/util"
 	"github.com/Salah2Eddin/go-http/pkg/util/charutil"
@@ -14,44 +15,13 @@ const (
 	paramSeparatorByte = byte(0x3b)
 )
 
-func validHeaderName(nameBytes []byte) bool {
-	for _, v := range nameBytes {
-		if !charutil.IsVisibleASCII(v) {
-			return false
-		}
-
-		// No whitespace is allowed between the field(httpheaders) name and colon (RFC9112 5.1)
-		if charutil.IsWhiteSpaceASCII(v) {
-			return false
-		}
-	}
-	return true
-}
-
-func validHeaderValue(valueBytes []byte) bool {
-	for _, v := range valueBytes {
-		/*
-			a recipient of CR, LF, or NUL within a field value
-			MUST either reject the message or replace each of those characters with SP.
-			Field values containing other CTL characters are also invalid;
-			however, recipients MAY retain such characters for
-			the sake of robustness when they appear within a safe context
-			RFC9110 5.5
-		*/
-		if charutil.IsCTLCharASCII(v) {
-			return false
-		}
-	}
-	return true
-}
-
 func processHeaderName(nameBytes []byte) string {
 	// lowercase to guarantee case insensitivity
 	processedBytes := bytes.ToLower(nameBytes)
 	return string(processedBytes)
 }
 
-func readUnquotedValue(reader *bytes.Reader) ([]byte, error) {
+func parseUnquotedValue(reader *bytes.Reader) ([]byte, error) {
 	value := make([]byte, 0)
 	whiteSpaces := make([]byte, 0)
 
@@ -88,7 +58,7 @@ func readUnquotedValue(reader *bytes.Reader) ([]byte, error) {
 	return value, nil
 }
 
-func readParameters(reader *bytes.Reader) ([]byte, error) {
+func parseParameters(reader *bytes.Reader) ([]byte, error) {
 	value := make([]byte, 0)
 	// read value parameters
 	for reader.Len() > 0 {
@@ -126,7 +96,7 @@ func readParameters(reader *bytes.Reader) ([]byte, error) {
 	return value, nil
 }
 
-func readQuotedValue(reader *bytes.Reader) ([]byte, error) {
+func parseQuotedValue(reader *bytes.Reader) ([]byte, error) {
 	value := make([]byte, 0)
 	// number of quotes found
 	count := 0
@@ -177,7 +147,7 @@ func readQuotedValue(reader *bytes.Reader) ([]byte, error) {
 	return nil, &pkgerrors.ErrInvalidHeader{}
 }
 
-func readNextValue(reader *bytes.Reader) ([]byte, []byte, error) {
+func parseNextValue(reader *bytes.Reader) ([]byte, []byte, error) {
 	value := make([]byte, 0)
 	for reader.Len() > 0 {
 		b, err := util.Peek(reader)
@@ -193,9 +163,9 @@ func readNextValue(reader *bytes.Reader) ([]byte, []byte, error) {
 		}
 
 		if b == doubleQuotesByte {
-			value, err = readQuotedValue(reader)
+			value, err = parseQuotedValue(reader)
 		} else {
-			value, err = readUnquotedValue(reader)
+			value, err = parseUnquotedValue(reader)
 		}
 		if err != nil {
 			return nil, nil, err
@@ -205,7 +175,7 @@ func readNextValue(reader *bytes.Reader) ([]byte, []byte, error) {
 		if reader.Len() > 0 {
 			b, err = util.Peek(reader)
 			if b == paramSeparatorByte {
-				params, err = readParameters(reader)
+				params, err = parseParameters(reader)
 				if err != nil {
 					return nil, nil, err
 				}
@@ -221,7 +191,7 @@ func splitHeaderValues(valueBytes []byte) ([][]byte, [][]byte, error) {
 	values := make([][]byte, 0)
 	params := make([][]byte, 0)
 	for valueBytesStream.Len() > 0 {
-		value, param, err := readNextValue(valueBytesStream)
+		value, param, err := parseNextValue(valueBytesStream)
 		if err != nil {
 			return nil, nil, err
 		}
