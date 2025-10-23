@@ -6,13 +6,14 @@ type IValueFormatter interface {
 
 var formatters = map[string]IValueFormatter{
 	"content-type": IdentityFormatter{},
+	"default":      QuotedFormatter{},
 }
 
 func formatterFactory(key string) IValueFormatter {
 	if formatter, ok := formatters[key]; ok {
 		return formatter
 	}
-	return QuotedFormatter{}
+	return formatters["default"]
 }
 
 type QuotedFormatter struct{}

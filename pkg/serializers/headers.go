@@ -6,13 +6,12 @@ import (
 )
 
 type HeadersSerializer struct {
+	headerSerializer HeaderSerializer
 }
 
 func (h HeadersSerializer) Serialize(headers *httpheader.Headers, buf *bytes.Buffer) {
-	headerSerializer := HeaderSerializer{}
-
 	for _, header := range headers.Headers() {
-		headerSerializer.Serialize(&header, buf)
+		h.headerSerializer.Serialize(&header, buf)
 	}
 	buf.WriteString("\r\n")
 }

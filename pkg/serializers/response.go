@@ -10,12 +10,11 @@ type ResponseSerializer struct {
 	headersSerializer HeadersSerializer
 }
 
-func bodySerializerFactory(resp *response.Response) ISerializer[[]byte] {
-	if _, ok := resp.Headers.Get("transfer-encoding"); ok {
-		// TODO: handle cases like chunked body
-		return BodySerializer{}
+func NewResponseSerializer() ResponseSerializer {
+	return ResponseSerializer{
+		statusSerializer:  StatusLineSerializer{},
+		headersSerializer: HeadersSerializer{},
 	}
-	return BodySerializer{}
 }
 
 func (r ResponseSerializer) Serialize(resp *response.Response, buf *bytes.Buffer) {

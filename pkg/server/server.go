@@ -29,8 +29,9 @@ func NewServer(address *Address) Server {
 
 	// Initialize the server with address and router in one statement
 	return Server{
-		addr:   *address,
-		router: router.NewRouter(),
+		addr:       *address,
+		router:     router.NewRouter(),
+		serializer: serializers.NewResponseSerializer(),
 	}
 }
 
