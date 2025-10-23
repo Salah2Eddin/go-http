@@ -2,20 +2,23 @@ package server
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/request"
 	"github.com/Salah2Eddin/go-http/pkg/response"
 	"github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
 	"github.com/Salah2Eddin/go-http/pkg/router"
+	"github.com/Salah2Eddin/go-http/pkg/serializers"
 	"github.com/Salah2Eddin/go-http/pkg/uri"
 	"net"
 	"strings"
 )
 
 type Server struct {
-	router router.Router
-	addr   Address
+	router     router.Router
+	addr       Address
+	serializer serializers.ResponseSerializer
 }
 
 // NewServer creates and initializes a new Server instance with the provided address or a default address if nil.
@@ -82,6 +85,8 @@ func (server *Server) processConnection(conn net.Conn) {
 	reader := bufio.NewReader(conn)
 
 	req, err := request.FromReader(reader)
+
+	// TODO: Do something better here
 	var res response.Response
 	if err != nil {
 		res = response.NewEmptyResponse(mapErrorToStatusCode(err))
@@ -89,7 +94,10 @@ func (server *Server) processConnection(conn net.Conn) {
 		res = server.router.RouteRequest(req)
 	}
 
-	_, err = conn.Write(res.Bytes())
+	buf := bytes.Buffer{}
+	server.serializer.Serialize(&res, &buf)
+
+	_, err = conn.Write(buf.Bytes())
 	if err != nil {
 		fmt.Printf("Error writing to conn %s:%s\n", conn.RemoteAddr(), err.Error())
 	}

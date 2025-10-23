@@ -1,23 +1,8 @@
 package httpheader
 
-import (
-	"strings"
-
-	"github.com/Salah2Eddin/go-http/pkg/util/charutil"
-)
-
 type Header struct {
 	name   string
 	values []Value
-}
-
-const (
-	valueSeparator = ","
-	paramSeparator = ";"
-)
-
-func needQuotes(s string) bool {
-	return strings.ContainsFunc(s, func(r rune) bool { return !charutil.IsTChar(byte(r)) })
 }
 
 func NewHeader(name string, values []Value) Header {

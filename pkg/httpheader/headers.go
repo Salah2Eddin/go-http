@@ -40,6 +40,6 @@ func (headers *Headers) Get(name string) (Header, bool) {
 	return val, exists
 }
 
-func (headers *Headers) Bytes() []byte {
-	return []byte(headers.Serialize())
+func (headers *Headers) Headers() map[string]Header {
+	return headers.headers
 }
