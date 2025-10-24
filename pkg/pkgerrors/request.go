@@ -33,3 +33,9 @@ type ErrIncorrectContentLength struct {
 func (err ErrIncorrectContentLength) Error() string {
 	return fmt.Sprintf("Request body's length doesn't equal content-length")
 }
+
+type ErrExpectedEmptyBody struct{}
+
+func (e ErrExpectedEmptyBody) Error() string {
+	return fmt.Sprintf("Expected empty body")
+}

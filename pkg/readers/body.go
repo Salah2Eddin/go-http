@@ -10,6 +10,9 @@ type EmptyBodyReader struct {
 }
 
 func (e EmptyBodyReader) Read(reader *bufio.Reader) ([]byte, error) {
+	if reader.Buffered() > 0 {
+		return nil, pkgerrors.ErrExpectedEmptyBody{}
+	}
 	return make([]byte, 0), nil
 }
 
