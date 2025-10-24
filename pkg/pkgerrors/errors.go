@@ -1,17 +1,27 @@
 package pkgerrors
 
-import "fmt"
-
-type ErrInvalidRequestLine struct{}
-
-func (err ErrInvalidRequestLine) Error() string {
-	return "Request is not an HTTP request"
+type AppError struct {
+	wrapped *error
 }
 
-type ErrInvalidHeader struct {
-	Line string
+// HTTPStatusCode returns the appropriate HTTP status code for each error
+func (app AppError) HTTPStatusCode() int {
+	switch (*app.wrapped).(type) {
+	case ErrInvalidRequestLine, ErrInvalidHeader, ErrInvalidUri, ErrInvalidContentLength, ErrIncorrectContentLength:
+		return 400 // Bad Request
+	case ErrRouteNotFound:
+		return 404 // Not Found
+	default:
+		return 500 // Internal Server Error
+	}
 }
 
-func (err ErrInvalidHeader) Error() string {
-	return fmt.Sprintf("%s is an invalid header", err.Line)
+func NewAppError(wrapped *error) AppError {
+	return AppError{
+		wrapped: wrapped,
+	}
+}
+
+func (app AppError) Error() string {
+	return (*app.wrapped).Error()
 }

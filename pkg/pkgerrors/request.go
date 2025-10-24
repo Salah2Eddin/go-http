@@ -2,21 +2,19 @@ package pkgerrors
 
 import "fmt"
 
-type ErrInvalidRoute struct {
-	Uri string
+type ErrInvalidRequestLine struct {
 }
 
-func (err ErrInvalidRoute) Error() string {
-	return fmt.Sprintf("%s doesn't have a handler", err.Uri)
+func (err ErrInvalidRequestLine) Error() string {
+	return "Request is not an HTTP request"
 }
 
-type ErrMethodNotAllowed struct {
-	Method string
-	Uri    string
+type ErrInvalidHeader struct {
+	Reason string
 }
 
-func (err ErrMethodNotAllowed) Error() string {
-	return fmt.Sprintf("%s %s is not implemented", err.Method, err.Uri)
+func (err ErrInvalidHeader) Error() string {
+	return fmt.Sprintf("Invalid header line because %s", err.Reason)
 }
 
 type ErrInvalidContentLength struct {
@@ -24,7 +22,7 @@ type ErrInvalidContentLength struct {
 }
 
 func (err ErrInvalidContentLength) Error() string {
-	return fmt.Sprintf("Invalid content length: %s", err.Length)
+	return fmt.Sprintf("%s is an invalid content length", err.Length)
 }
 
 type ErrIncorrectContentLength struct {
