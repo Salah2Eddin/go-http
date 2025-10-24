@@ -39,3 +39,10 @@ type ErrExpectedEmptyBody struct{}
 func (e ErrExpectedEmptyBody) Error() string {
 	return fmt.Sprintf("Expected empty body")
 }
+
+type ErrUnsupportedBodyTransferEncoding struct {
+}
+
+func (e ErrUnsupportedBodyTransferEncoding) Error() string {
+	return fmt.Sprintf("Unsupported body transfer encoding")
+}

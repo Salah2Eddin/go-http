@@ -3,6 +3,7 @@ package readers
 import (
 	"bufio"
 	"github.com/Salah2Eddin/go-http/pkg/httpheader"
+	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/reqline"
 	"github.com/Salah2Eddin/go-http/pkg/request"
 	"strconv"
@@ -13,18 +14,18 @@ type RequestReader struct {
 	headersReader headersReader
 }
 
-func (r RequestReader) bodyReaderFactory(headers *httpheader.Headers) iReader[any] {
+func (r RequestReader) bodyReaderFactory(headers *httpheader.Headers) (iReader[any], error) {
 	//TODO: other body reading strategies
 	if val, exists := headers.Get("transfer-encoding"); exists {
-		panic("Only supports content-length and empty bodies ")
+		return nil, pkgerrors.ErrUnsupportedBodyTransferEncoding{}
 	} else if val, exists = headers.Get("content-length"); exists {
 		length, err := strconv.Atoi(val.Values()[0].Value())
 		if err != nil {
-			return nil
+			return nil, pkgerrors.ErrInvalidContentLength{}
 		}
-		return newLengthBodyReader(length)
+		return newLengthBodyReader(length), nil
 	} else {
-		return EmptyBodyReader{}
+		return EmptyBodyReader{}, nil
 	}
 }
 
@@ -44,7 +45,10 @@ func (r RequestReader) Parse(reader *bufio.Reader) (request.Request, error) {
 		return request.Request{}, err
 	}
 
-	bodyReader := r.bodyReaderFactory(&headers)
+	bodyReader, err := r.bodyReaderFactory(&headers)
+	if err != nil {
+		return request.Request{}, err
+	}
 	body, err := bodyReader.Read(reader)
 	if err != nil {
 		return request.Request{}, err
