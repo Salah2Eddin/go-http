@@ -249,13 +249,9 @@ func parseHeaderLine(headerLineBytes []byte) (Header, error) {
 	return header, nil
 }
 
-func checkHeadersEnd(bytes *[]byte) bool {
-	return len(*bytes) == 0
-}
-
-func ParseRequestHeaders(lines *[][]byte) (Headers, error) {
+func ParseRequestHeaders(lines [][]byte) (Headers, error) {
 	headers := New()
-	for _, line := range *lines {
+	for _, line := range lines {
 		header, err := parseHeaderLine(line)
 		if err != nil {
 			return Headers{}, err
