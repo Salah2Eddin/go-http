@@ -58,6 +58,7 @@ func (server *Server) AddHandler(uriStr string, method string, handler router.Ha
 // based on the type of error encountered.
 func mapErrorToStatusCode(err error) response.StatusLine {
 	switch err.(type) {
+	// ErrExpectedEmptyBody indicates that a request body was received when none was expected, which is a client-side error.
 	case pkgerrors.ErrInvalidHeader, pkgerrors.ErrInvalidRequestLine, pkgerrors.ErrExpectedEmptyBody:
 		return statuscodes.Status400()
 	default:
