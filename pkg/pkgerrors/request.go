@@ -33,3 +33,16 @@ type ErrIncorrectContentLength struct {
 func (err ErrIncorrectContentLength) Error() string {
 	return fmt.Sprintf("Request body's length doesn't equal content-length")
 }
+
+type ErrExpectedEmptyBody struct{}
+
+func (e ErrExpectedEmptyBody) Error() string {
+	return fmt.Sprintf("Expected empty body")
+}
+
+type ErrUnsupportedBodyTransferEncoding struct {
+}
+
+func (e ErrUnsupportedBodyTransferEncoding) Error() string {
+	return fmt.Sprintf("Unsupported body transfer encoding")
+}

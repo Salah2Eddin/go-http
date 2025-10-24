@@ -32,5 +32,6 @@ func index(request request.Request) response.Response {
 func main() {
 	app := server.NewServer(&server.Address{IP: "127.0.0.1", Port: "8008"})
 	app.AddHandler("/id/*", "GET", index)
+
 	app.Start()
 }

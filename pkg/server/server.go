@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
-	"github.com/Salah2Eddin/go-http/pkg/request"
+	"github.com/Salah2Eddin/go-http/pkg/readers"
 	"github.com/Salah2Eddin/go-http/pkg/response"
 	"github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
 	"github.com/Salah2Eddin/go-http/pkg/router"
@@ -18,6 +18,7 @@ import (
 type Server struct {
 	router     router.Router
 	addr       Address
+	reader     readers.RequestReader
 	serializer serializers.ResponseSerializer
 }
 
@@ -57,7 +58,8 @@ func (server *Server) AddHandler(uriStr string, method string, handler router.Ha
 // based on the type of error encountered.
 func mapErrorToStatusCode(err error) response.StatusLine {
 	switch err.(type) {
-	case pkgerrors.ErrInvalidHeader, pkgerrors.ErrInvalidRequestLine:
+	// ErrExpectedEmptyBody indicates that a request body was received when none was expected, which is a client-side error.
+	case pkgerrors.ErrInvalidHeader, pkgerrors.ErrInvalidRequestLine, pkgerrors.ErrExpectedEmptyBody:
 		return statuscodes.Status400()
 	default:
 		return statuscodes.Status500()
@@ -85,7 +87,7 @@ func (server *Server) processConnection(conn net.Conn) {
 	defer closeConn(conn)
 	reader := bufio.NewReader(conn)
 
-	req, err := request.FromReader(reader)
+	req, err := server.reader.Parse(reader)
 
 	// TODO: Do something better here
 	var res response.Response
