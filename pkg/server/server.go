@@ -60,7 +60,7 @@ func mapErrorToStatusCode(err error) *response.StatusLine {
 func closeConn(conn net.Conn) {
 	err := conn.Close()
 	if err != nil {
-		panic(err)
+		fmt.Printf("Failed to close connection: %s\n", conn.RemoteAddr().String())
 	}
 }
 
