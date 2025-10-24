@@ -26,8 +26,8 @@ func newLengthBodyReader(length int) lengthBodyReader {
 
 func (r lengthBodyReader) Read(reader *bufio.Reader) ([]byte, error) {
 	buf := make([]byte, r.length)
-	n, err := io.ReadFull(reader, buf)
-	if n != r.length || err != nil {
+	_, err := io.ReadFull(reader, buf)
+	if err != nil {
 		return nil, &pkgerrors.ErrIncorrectContentLength{}
 	}
 	return buf, nil
