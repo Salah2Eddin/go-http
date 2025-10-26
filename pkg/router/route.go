@@ -11,10 +11,10 @@ type Route struct {
 	methodHandlers map[string]Handler
 }
 
-func newRoute() Route {
+func newRoute() *Route {
 	route := Route{}
 	route.methodHandlers = make(map[string]Handler)
-	return route
+	return &route
 }
 
 func (route *Route) AddHandler(method string, handler Handler) {

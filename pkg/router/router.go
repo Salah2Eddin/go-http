@@ -19,13 +19,12 @@ func NewRouter() Router {
 }
 
 func (router *Router) newRoute(uri *uri.Uri) (*Route, error) {
-	route := newRoute()
 	id, err := router.tree.addRoute(uri)
 	if err != nil {
 		return nil, err
 	}
-	router.routes[id] = &route
-	return &route, nil
+	router.routes[id] = newRoute()
+	return router.routes[id], nil
 }
 
 func (router *Router) getOrCreateRoute(uri *uri.Uri) (*Route, error) {
