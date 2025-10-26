@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/uri"
 )
 
@@ -64,5 +65,9 @@ func (router *Router) GetRequestHandler(uri *uri.Uri, method string) (Handler, e
 	if err != nil {
 		return nil, err
 	}
-	return route.GetHandler(method), nil
+	handler := route.GetHandler(method)
+	if handler == nil {
+		return nil, pkgerrors.ErrMethodNotAllowed{Method: method, Uri: uri.String()}
+	}
+	return handler, nil
 }
