@@ -10,12 +10,12 @@ type Router struct {
 	tree   RoutesTree
 }
 
-func NewRouter() Router {
+func NewRouter() *Router {
 	router := Router{
 		routes: make(map[int]*Route),
 		tree:   NewRoutesTree(),
 	}
-	return router
+	return &router
 }
 
 func (router *Router) newRoute(uri *uri.Uri) (*Route, error) {

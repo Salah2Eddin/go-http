@@ -14,6 +14,13 @@ type RequestReader struct {
 	headersReader headersReader
 }
 
+func NewRequestReader() RequestReader {
+	return RequestReader{
+		reqLineReader: requestLineReader{},
+		headersReader: headersReader{},
+	}
+}
+
 func (r RequestReader) bodyReaderFactory(headers *httpheader.Headers) (iReader[any], error) {
 	//TODO: other body reading strategies
 	if val, exists := headers.Get("transfer-encoding"); exists {

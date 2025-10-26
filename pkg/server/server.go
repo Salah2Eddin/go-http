@@ -17,23 +17,24 @@ import (
 )
 
 type Server struct {
-	router     router.Router
-	addr       Address
+	router     *router.Router
+	addr       *Address
 	reader     readers.RequestReader
 	serializer serializers.ResponseSerializer
 }
 
 // NewServer creates and initializes a new Server instance with the provided address or a default address if nil.
-func NewServer(address *Address) Server {
+func NewServer(address *Address) *Server {
 	if address == nil {
 		address = &Address{} // Default address
 	}
 
 	// Initialize the server with address and router in one statement
-	return Server{
-		addr:       *address,
+	return &Server{
+		addr:       address,
 		router:     router.NewRouter(),
 		serializer: serializers.NewResponseSerializer(),
+		reader:     readers.NewRequestReader(),
 	}
 }
 
@@ -48,8 +49,10 @@ func (server *Server) AddHandler(uriStr string, method string, handler router.Ha
 func mapErrorToStatusCode(err error) response.StatusLine {
 	switch err.(type) {
 	// ErrExpectedEmptyBody indicates that a request body was received when none was expected, which is a client-side error.
-	case pkgerrors.ErrInvalidHeader, pkgerrors.ErrInvalidRequestLine, pkgerrors.ErrExpectedEmptyBody:
+	case pkgerrors.ErrInvalidHeader, pkgerrors.ErrInvalidRequestLine, pkgerrors.ErrExpectedEmptyBody, pkgerrors.ErrMethodNotAllowed:
 		return statuscodes.Status400()
+	case pkgerrors.ErrRouteNotFound:
+		return statuscodes.Status404()
 	default:
 		return statuscodes.Status500()
 	}
