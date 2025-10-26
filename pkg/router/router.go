@@ -5,26 +5,26 @@ import (
 )
 
 type Router struct {
-	routes map[int]Route
+	routes map[int]*Route
 	tree   RoutesTree
 }
 
 func NewRouter() Router {
 	router := Router{
-		routes: make(map[int]Route),
+		routes: make(map[int]*Route),
 		tree:   NewRoutesTree(),
 	}
 	return router
 }
 
-func (router *Router) newRoute(uri *uri.Uri) (Route, error) {
+func (router *Router) newRoute(uri *uri.Uri) (*Route, error) {
 	route := newRoute()
 	id, err := router.tree.addRoute(uri)
 	if err != nil {
-		return Route{}, err
+		return &Route{}, err
 	}
-	router.routes[id] = route
-	return route, nil
+	router.routes[id] = &route
+	return &route, nil
 }
 
 func (router *Router) getOrCreateRoute(uri *uri.Uri) (*Route, error) {
@@ -35,13 +35,13 @@ func (router *Router) getOrCreateRoute(uri *uri.Uri) (*Route, error) {
 			return nil, err
 		}
 	}
-	return &route, nil
+	return route, nil
 }
 
-func (router *Router) getRoute(uri *uri.Uri, allowWildcardInURI bool) (Route, error) {
+func (router *Router) getRoute(uri *uri.Uri, allowWildcardInURI bool) (*Route, error) {
 	id, err := router.tree.find(uri, allowWildcardInURI)
 	if err != nil {
-		return Route{}, err
+		return &Route{}, err
 	}
 	// at this point, a route with id is guaranteed to exist
 	return router.routes[id], nil
