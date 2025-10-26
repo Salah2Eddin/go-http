@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/Salah2Eddin/go-http/pkg/httpheaders"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/readers"
 	"github.com/Salah2Eddin/go-http/pkg/request"
@@ -43,18 +44,24 @@ func (server *Server) AddHandler(uriStr string, method string, handler router.Ha
 	return server.router.AddHandler(uri.NewUri(uriStr), method, handler)
 }
 
-// Returns the appropriate HTTP status code
-// based on the type of error encountered.
-func mapErrorToStatusCode(err error) *response.StatusLine {
-	switch err.(type) {
-	// ErrExpectedEmptyBody indicates that a request body was received when none was expected, which is a client-side error.
-	case pkgerrors.ErrInvalidHeader, pkgerrors.ErrInvalidRequestLine, pkgerrors.ErrExpectedEmptyBody, pkgerrors.ErrMethodNotAllowed:
-		return response.Status400()
-	case pkgerrors.ErrRouteNotFound:
-		return response.Status404()
-	default:
-		return response.Status500()
+func ErrorToResponse(err *pkgerrors.AppError) *response.Response {
+	// buf := []byte(err.Error())
+	headers := httpheader.New()
+	err2 := headers.AddFromString("content-type", "text/plain; charset=utf-8")
+	if err2 != nil {
+		headers = httpheader.Headers{}
 	}
+	buf := make([]byte, 0)
+	resp := response.NewResponse(
+		response.StatusLine{
+			Version: "HTTP/1.0",
+			Code:    err.HTTPStatusCode(),
+			Phrase:  "",
+		},
+		headers,
+		&buf,
+	)
+	return &resp
 }
 
 func closeConn(conn net.Conn) {
@@ -72,7 +79,7 @@ func closeListener(listener net.Listener) {
 }
 
 func (*Server) handleError(err error) *response.Response {
-	return response.NewEmptyResponse(mapErrorToStatusCode(err))
+	return ErrorToResponse(err)
 }
 
 func (server *Server) handle(req *request.Request, err error) *response.Response {

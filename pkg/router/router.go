@@ -59,14 +59,14 @@ func (router *Router) AddHandler(uri *uri.Uri, method string, handler Handler) e
 }
 
 // GetRequestHandler takes an uri and a method and returns the handler associated with them
-func (router *Router) GetRequestHandler(uri *uri.Uri, method string) (Handler, error) {
+func (router *Router) GetRequestHandler(uri *uri.Uri, method string) (Handler, *pkgerrors.AppError) {
 	route, err := router.getRoute(uri, true)
 	if err != nil {
 		return nil, err
 	}
 	handler := route.GetHandler(method)
 	if handler == nil {
-		return nil, pkgerrors.ErrMethodNotAllowed{Method: method, Uri: uri.String()}
+		return nil, pkgerrors.NewAppError(&pkgerrors.ErrMethodNotAllowed{Method: method, Uri: uri.String())}
 	}
 	return handler, nil
 }

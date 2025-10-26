@@ -17,3 +17,11 @@ type ErrRouteNotFound struct {
 func (err ErrRouteNotFound) Error() string {
 	return fmt.Sprintf("%s doesn't exist", err.Route)
 }
+
+type ErrRouteMethodNotAllowed struct {
+	Method string
+}
+
+func (err ErrRouteMethodNotAllowed) Error() string {
+	return fmt.Sprintf("Method %s is not allowed", err.Method)
+}
