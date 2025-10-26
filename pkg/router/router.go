@@ -21,7 +21,7 @@ func (router *Router) newRoute(uri *uri.Uri) (*Route, error) {
 	route := newRoute()
 	id, err := router.tree.addRoute(uri)
 	if err != nil {
-		return &Route{}, err
+		return nil, err
 	}
 	router.routes[id] = &route
 	return &route, nil
@@ -41,7 +41,7 @@ func (router *Router) getOrCreateRoute(uri *uri.Uri) (*Route, error) {
 func (router *Router) getRoute(uri *uri.Uri, allowWildcardInURI bool) (*Route, error) {
 	id, err := router.tree.find(uri, allowWildcardInURI)
 	if err != nil {
-		return &Route{}, err
+		return nil, err
 	}
 	// at this point, a route with id is guaranteed to exist
 	return router.routes[id], nil
