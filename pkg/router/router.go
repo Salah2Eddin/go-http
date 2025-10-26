@@ -27,15 +27,15 @@ func (router *Router) newRoute(uri *uri.Uri) (Route, error) {
 	return route, nil
 }
 
-func (router *Router) getOrCreateRoute(uri *uri.Uri) Route {
+func (router *Router) getOrCreateRoute(uri *uri.Uri) (*Route, error) {
 	route, err := router.getRoute(uri, false)
 	if err != nil {
 		route, err = router.newRoute(uri)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
-	return route
+	return &route, nil
 }
 
 func (router *Router) getRoute(uri *uri.Uri, allowWildcardInURI bool) (Route, error) {
@@ -49,9 +49,13 @@ func (router *Router) getRoute(uri *uri.Uri, allowWildcardInURI bool) (Route, er
 
 // AddHandler Registers a new handler for the given URI and HTTP method.
 // If the route corresponding to the URI does not exist, a new route is created.
-func (router *Router) AddHandler(uri *uri.Uri, method string, handler Handler) {
-	route := router.getOrCreateRoute(uri)
+func (router *Router) AddHandler(uri *uri.Uri, method string, handler Handler) error {
+	route, err := router.getOrCreateRoute(uri)
+	if err != nil {
+		return err
+	}
 	route.AddHandler(method, handler)
+	return nil
 }
 
 // GetRequestHandler takes an uri and a method and returns the handler associated with them
