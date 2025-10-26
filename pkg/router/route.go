@@ -5,7 +5,7 @@ import (
 	"github.com/Salah2Eddin/go-http/pkg/response"
 )
 
-type Handler func(request request.Request) (*response.Response, error)
+type Handler func(request *request.Request) (*response.Response, error)
 
 type Route struct {
 	methodHandlers map[string]Handler

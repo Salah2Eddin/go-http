@@ -9,7 +9,7 @@ import (
 	"github.com/Salah2Eddin/go-http/pkg/server"
 )
 
-func index(request request.Request) (*response.Response, error) {
+func index(request *request.Request) (*response.Response, error) {
 	status := statuscodes.Status200()
 
 	id := request.Uri().GetSegments()[2]

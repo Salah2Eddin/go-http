@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/readers"
+	"github.com/Salah2Eddin/go-http/pkg/request"
 	"github.com/Salah2Eddin/go-http/pkg/response"
 	"github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
 	"github.com/Salah2Eddin/go-http/pkg/router"
@@ -68,6 +69,28 @@ func closeListener(listener net.Listener) {
 	}
 }
 
+func (*Server) handleError(err error) *response.Response {
+	return response.NewEmptyResponse(mapErrorToStatusCode(err))
+}
+
+func (server *Server) handle(req *request.Request, err error) *response.Response {
+	if err != nil {
+		return server.handleError(err)
+	}
+
+	handler, err := server.router.GetRequestHandler(req.Uri(), req.Method())
+	if err != nil {
+		return server.handleError(err)
+	}
+
+	res, err := handler(req)
+	if err != nil {
+		return server.handleError(err)
+	}
+
+	return res
+}
+
 // Handles an incoming client connection.
 // It reads and parses the request, processes it, writes the response,
 // and then closes the connection.
@@ -77,21 +100,7 @@ func (server *Server) processConnection(conn net.Conn) {
 
 	req, err := server.reader.Parse(reader)
 
-	// TODO: Do something better here
-	var res *response.Response
-	if err != nil {
-		res = response.NewEmptyResponse(mapErrorToStatusCode(err))
-	} else {
-		handler, err := server.router.GetRequestHandler(req.Uri(), req.Method())
-		if err != nil {
-			res = response.NewEmptyResponse(mapErrorToStatusCode(err))
-		} else {
-			res, err = handler(req)
-			if err != nil {
-				res = response.NewEmptyResponse(mapErrorToStatusCode(err))
-			}
-		}
-	}
+	res := server.handle(&req, err)
 
 	buf := bytes.Buffer{}
 	server.serializer.Serialize(res, &buf)
