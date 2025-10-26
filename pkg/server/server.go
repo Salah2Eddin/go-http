@@ -88,10 +88,11 @@ func (server *Server) processConnection(conn net.Conn) {
 		handler, err := server.router.GetRequestHandler(req.Uri(), req.Method())
 		if err != nil {
 			res = response.NewEmptyResponse(mapErrorToStatusCode(err))
-		}
-		res, err = handler(req)
-		if err != nil {
-			res = response.NewEmptyResponse(mapErrorToStatusCode(err))
+		} else {
+			res, err = handler(req)
+			if err != nil {
+				res = response.NewEmptyResponse(mapErrorToStatusCode(err))
+			}
 		}
 	}
 
