@@ -15,10 +15,10 @@ type Uri struct {
 }
 
 // NewUri creates a Uri instance from the provided full URI string by parsing its components.
-func NewUri(fullUri string) Uri {
+func NewUri(fullUri string) *Uri {
 	uri := Uri{uri: fullUri}
 	parseURI(fullUri, &uri)
-	return uri
+	return &uri
 }
 
 // String returns the path component of the Uri as a string.

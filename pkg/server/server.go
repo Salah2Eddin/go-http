@@ -36,22 +36,10 @@ func NewServer(address *Address) Server {
 	}
 }
 
-func (server *Server) getOrCreateRoute(uri uri.Uri) router.Route {
-	route, err := server.router.GetRoute(uri, false)
-	if err != nil {
-		route, err = server.router.NewRoute(uri)
-		if err != nil {
-			panic(err)
-		}
-	}
-	return route
-}
-
 // AddHandler Registers a new handler for the given URI and HTTP method.
 // If the route corresponding to the URI does not exist, a new route is created.
 func (server *Server) AddHandler(uriStr string, method string, handler router.Handler) {
-	route := server.getOrCreateRoute(uri.NewUri(uriStr))
-	route.AddHandler(method, handler)
+	server.router.AddHandler(uri.NewUri(uriStr), method, handler)
 }
 
 // Returns the appropriate HTTP status code
@@ -90,15 +78,22 @@ func (server *Server) processConnection(conn net.Conn) {
 	req, err := server.reader.Parse(reader)
 
 	// TODO: Do something better here
-	var res response.Response
+	var res *response.Response
 	if err != nil {
 		res = response.NewEmptyResponse(mapErrorToStatusCode(err))
 	} else {
-		res = server.router.RouteRequest(req)
+		handler, err := server.router.GetRequestHandler(req.Uri(), req.Method())
+		if err != nil {
+			res = response.NewEmptyResponse(mapErrorToStatusCode(err))
+		}
+		res, err = handler(req)
+		if err != nil {
+			res = response.NewEmptyResponse(mapErrorToStatusCode(err))
+		}
 	}
 
 	buf := bytes.Buffer{}
-	server.serializer.Serialize(&res, &buf)
+	server.serializer.Serialize(res, &buf)
 
 	_, err = conn.Write(buf.Bytes())
 	if err != nil {

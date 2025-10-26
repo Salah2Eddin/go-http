@@ -34,7 +34,7 @@ func (tree *RoutesTree) newTreeNode() *routerTreeNode {
 	return &newChild
 }
 
-func (tree *RoutesTree) find(uri uri.Uri, allowWildcard bool) (int, error) {
+func (tree *RoutesTree) find(uri *uri.Uri, allowWildcardInURI bool) (int, error) {
 	pathSegments := uri.GetSegments()
 	current := &tree.root
 
@@ -42,7 +42,7 @@ func (tree *RoutesTree) find(uri uri.Uri, allowWildcard bool) (int, error) {
 		partHash := tree.hasher(pathSegment)
 		next := current.find(partHash)
 		if next == nil {
-			if allowWildcard || isWildcard(pathSegment) {
+			if allowWildcardInURI || isWildcard(pathSegment) {
 				next = current.wildcard()
 			}
 			if next == nil {
@@ -79,7 +79,7 @@ func (tree *RoutesTree) getOrCreateTreeNode(current *routerTreeNode, name string
 	return next, nil
 }
 
-func (tree *RoutesTree) addRoute(uri uri.Uri) (int, error) {
+func (tree *RoutesTree) addRoute(uri *uri.Uri) (int, error) {
 	pathSegments := uri.GetSegments()
 	current := &tree.root
 

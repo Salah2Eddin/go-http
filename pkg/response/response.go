@@ -10,17 +10,17 @@ type Response struct {
 	Body    *[]byte
 }
 
-func NewEmptyResponse(line StatusLine) Response {
+func NewEmptyResponse(line StatusLine) *Response {
 	body := make([]byte, 0)
-	return Response{
+	return &Response{
 		Line:    line,
 		Headers: httpheader.Headers{},
 		Body:    &body,
 	}
 }
 
-func NewResponse(line StatusLine, headers httpheader.Headers, body *[]byte) Response {
-	return Response{
+func NewResponse(line StatusLine, headers httpheader.Headers, body *[]byte) *Response {
+	return &Response{
 		Line:    line,
 		Headers: headers,
 		Body:    body,

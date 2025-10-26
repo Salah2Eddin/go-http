@@ -20,7 +20,7 @@ func NewRequest(line reqline.RequestLine, headers httpheader.Headers, body *[]by
 	}
 }
 
-func (req *Request) Uri() uri.Uri {
+func (req *Request) Uri() *uri.Uri {
 	return req.line.Uri
 }
 
