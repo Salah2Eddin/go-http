@@ -21,7 +21,7 @@ func NewRequestReader() RequestReader {
 	}
 }
 
-func (r RequestReader) bodyReaderFactory(headers *httpheader.Headers) (iReader[any], error) {
+func (r RequestReader) bodyReaderFactory(headers *httpheader.Headers) (iReader, error) {
 	//TODO: other body reading strategies
 	if val, exists := headers.Get("transfer-encoding"); exists {
 		return nil, pkgerrors.ErrUnsupportedBodyTransferEncoding{}
