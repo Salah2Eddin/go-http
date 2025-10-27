@@ -46,22 +46,22 @@ func (server *Server) AddHandler(uriStr string, method string, handler router.Ha
 
 func ErrorToResponse(err *pkgerrors.AppError) *response.Response {
 	// buf := []byte(err.Error())
-	headers := httpheader.New()
+	headers := httpheaders.New()
 	err2 := headers.AddFromString("content-type", "text/plain; charset=utf-8")
 	if err2 != nil {
-		headers = httpheader.Headers{}
+		headers = &httpheaders.Headers{}
 	}
 	buf := make([]byte, 0)
 	resp := response.NewResponse(
-		response.StatusLine{
+		&response.StatusLine{
 			Version: "HTTP/1.0",
 			Code:    err.HTTPStatusCode(),
 			Phrase:  "",
 		},
 		headers,
-		&buf,
+		buf,
 	)
-	return &resp
+	return resp
 }
 
 func closeConn(conn net.Conn) {
@@ -78,11 +78,11 @@ func closeListener(listener net.Listener) {
 	}
 }
 
-func (*Server) handleError(err error) *response.Response {
+func (*Server) handleError(err *pkgerrors.AppError) *response.Response {
 	return ErrorToResponse(err)
 }
 
-func (server *Server) handle(req *request.Request, err error) *response.Response {
+func (server *Server) handle(req *request.Request, err *pkgerrors.AppError) *response.Response {
 	if err != nil {
 		return server.handleError(err)
 	}
@@ -91,10 +91,9 @@ func (server *Server) handle(req *request.Request, err error) *response.Response
 	if err != nil {
 		return server.handleError(err)
 	}
-
-	res, err := handler(req)
-	if err != nil {
-		return server.handleError(err)
+	res, e := handler(req)
+	if e != nil {
+		return server.handleError(pkgerrors.NewAppError(e))
 	}
 
 	return res
@@ -114,8 +113,8 @@ func (server *Server) processConnection(conn net.Conn) {
 	buf := bytes.Buffer{}
 	server.serializer.Serialize(res, &buf)
 
-	_, err = conn.Write(buf.Bytes())
-	if err != nil {
+	_, writeError := conn.Write(buf.Bytes())
+	if writeError != nil {
 		fmt.Printf("Error writing to conn %s:%s\n", conn.RemoteAddr(), err.Error())
 	}
 }

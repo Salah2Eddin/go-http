@@ -1,10 +1,10 @@
 package pkgerrors
 
 type AppError struct {
-	wrapped *error
+	wrapped error
 }
 
-func NewAppError(wrapped *error) *AppError {
+func NewAppError(wrapped error) *AppError {
 	return &AppError{
 		wrapped: wrapped,
 	}
@@ -12,10 +12,10 @@ func NewAppError(wrapped *error) *AppError {
 
 // HTTPStatusCode returns the appropriate HTTP status code for each error
 func (app AppError) HTTPStatusCode() string {
-	switch (*app.wrapped).(type) {
+	switch app.wrapped.(type) {
 	case ErrInvalidRequestLine, ErrInvalidHeader, ErrInvalidUri, ErrInvalidContentLength, ErrIncorrectContentLength, ErrExpectedEmptyBody, ErrUnsupportedBodyTransferEncoding:
 		return "400" // Bad Request
-	case ErrRouteMethodNotAllowed:
+	case ErrMethodNotAllowed:
 		return "405" // Method Not Allowed
 	case ErrRouteNotFound:
 		return "404" // Not Found
@@ -25,5 +25,5 @@ func (app AppError) HTTPStatusCode() string {
 }
 
 func (app AppError) Error() string {
-	return (*app.wrapped).Error()
+	return app.wrapped.Error()
 }

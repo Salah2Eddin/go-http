@@ -18,10 +18,10 @@ func (err ErrRouteNotFound) Error() string {
 	return fmt.Sprintf("%s doesn't exist", err.Route)
 }
 
-type ErrRouteMethodNotAllowed struct {
+type ErrMethodNotAllowed struct {
 	Method string
 }
 
-func (err ErrRouteMethodNotAllowed) Error() string {
+func (err ErrMethodNotAllowed) Error() string {
 	return fmt.Sprintf("Method %s is not allowed", err.Method)
 }
