@@ -201,12 +201,12 @@ func splitHeaderValues(valueBytes []byte) ([][]byte, [][]byte, error) {
 	return values, params, nil
 }
 
-func processHeaderValues(valueBytes []byte) ([]Value, error) {
+func processHeaderValues(valueBytes []byte) ([]*Value, error) {
 	values, params, err := splitHeaderValues(valueBytes)
 	if err != nil {
 		return nil, err
 	}
-	headerValues := make([]Value, 0)
+	headerValues := make([]*Value, 0)
 	for i := range values {
 		// Empty elements do not contribute to the count of elements present.
 		// RFC9110 5.6.1.2
@@ -214,7 +214,7 @@ func processHeaderValues(valueBytes []byte) ([]Value, error) {
 			continue
 		}
 		value := NewHeaderValueFromBytes(values[i], params[i])
-		headerValues = append(headerValues, *value)
+		headerValues = append(headerValues, value)
 	}
 	/*
 		at least one non-empty element is required

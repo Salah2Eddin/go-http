@@ -32,7 +32,7 @@ func (HeaderSerializer) Serialize(header *httpheaders.Header, buf *bytes.Buffer)
 		}
 		formatter := formatterFactory(header.Name())
 		valueSerializer.SetFormatter(formatter)
-		valueSerializer.Serialize(&values[i], buf)
+		valueSerializer.Serialize(values[i], buf)
 	}
 }
 
