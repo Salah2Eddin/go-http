@@ -53,6 +53,7 @@ func IsHexDigit(b byte) bool {
 	return IsDigit(b) || IsHexAlpha(b)
 }
 
+// IsTChar checks if the given byte is a valid "tchar" as defined by specific alphanumeric and symbol rules.
 func IsTChar(b byte) bool {
 	if IsAlphaNum(b) {
 		return true
