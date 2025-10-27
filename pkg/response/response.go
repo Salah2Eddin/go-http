@@ -7,7 +7,7 @@ import (
 type Response struct {
 	Line    *StatusLine
 	Headers *httpheaders.Headers
-	Body    *[]byte
+	Body    []byte
 }
 
 func NewEmptyResponse(line *StatusLine) *Response {
@@ -15,11 +15,11 @@ func NewEmptyResponse(line *StatusLine) *Response {
 	return &Response{
 		Line:    line,
 		Headers: httpheaders.New(),
-		Body:    &body,
+		Body:    body,
 	}
 }
 
-func NewResponse(line *StatusLine, headers *httpheaders.Headers, body *[]byte) *Response {
+func NewResponse(line *StatusLine, headers *httpheaders.Headers, body []byte) *Response {
 	return &Response{
 		Line:    line,
 		Headers: headers,

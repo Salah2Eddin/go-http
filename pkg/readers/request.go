@@ -26,7 +26,7 @@ func (r RequestReader) bodyReaderFactory(headers *httpheaders.Headers) (iReader,
 	if val, exists := headers.Get("transfer-encoding"); exists {
 		return nil, pkgerrors.ErrUnsupportedBodyTransferEncoding{}
 	} else if val, exists = headers.Get("content-length"); exists {
-		length, err := strconv.Atoi((*val.Values())[0].Value())
+		length, err := strconv.Atoi((val.Values())[0].Value())
 		if err != nil {
 			return nil, pkgerrors.ErrInvalidContentLength{}
 		}

@@ -9,10 +9,10 @@ import (
 type Request struct {
 	line    *reqline.RequestLine
 	headers *httpheaders.Headers
-	Body    *[]byte
+	Body    []byte
 }
 
-func NewRequest(line *reqline.RequestLine, headers *httpheaders.Headers, body *[]byte) Request {
+func NewRequest(line *reqline.RequestLine, headers *httpheaders.Headers, body []byte) Request {
 	return Request{
 		line:    line,
 		headers: headers,

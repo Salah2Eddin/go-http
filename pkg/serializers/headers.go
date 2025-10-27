@@ -26,13 +26,13 @@ func (HeaderSerializer) Serialize(header *httpheaders.Header, buf *bytes.Buffer)
 	values := header.Values()
 	valueSerializer := ValueSerializer{}
 
-	for i := range *values {
+	for i := range values {
 		if i != 0 {
 			buf.WriteString(headerValueSeparator)
 		}
 		formatter := formatterFactory(header.Name())
 		valueSerializer.SetFormatter(formatter)
-		valueSerializer.Serialize(&(*values)[i], buf)
+		valueSerializer.Serialize(&values[i], buf)
 	}
 }
 

@@ -9,7 +9,7 @@ type Value struct {
 	params map[string]string
 }
 
-func NewHeaderValues(value string) *[]Value {
+func NewHeaderValues(value string) []Value {
 	values, err := processHeaderValues([]byte(value))
 	if err != nil {
 		return nil

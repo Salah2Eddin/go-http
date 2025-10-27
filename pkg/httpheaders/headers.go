@@ -27,7 +27,7 @@ func (headers *Headers) AddFromHeader(header *Header) {
 	if h, exists := headers.headers[name]; exists {
 		// header with same name exists
 		// add new header values to it
-		for _, value := range *header.Values() {
+		for _, value := range header.Values() {
 			h.AddValue(value)
 		}
 	}

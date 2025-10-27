@@ -21,6 +21,6 @@ func bodySerializerFactory(resp *response.Response) ISerializer[[]byte] {
 type BodySerializer struct {
 }
 
-func (b BodySerializer) Serialize(body *[]byte, buf *bytes.Buffer) {
-	buf.Write(*body)
+func (b BodySerializer) Serialize(body []byte, buf *bytes.Buffer) {
+	buf.Write(body)
 }

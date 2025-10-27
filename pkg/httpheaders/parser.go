@@ -201,7 +201,7 @@ func splitHeaderValues(valueBytes []byte) ([][]byte, [][]byte, error) {
 	return values, params, nil
 }
 
-func processHeaderValues(valueBytes []byte) (*[]Value, error) {
+func processHeaderValues(valueBytes []byte) ([]Value, error) {
 	values, params, err := splitHeaderValues(valueBytes)
 	if err != nil {
 		return nil, err
@@ -224,7 +224,7 @@ func processHeaderValues(valueBytes []byte) (*[]Value, error) {
 		return nil, pkgerrors.ErrInvalidHeader{}
 	}
 
-	return &headerValues, nil
+	return headerValues, nil
 }
 
 func nameValueSplit(headerLineBytes []byte) ([]byte, []byte, bool) {
