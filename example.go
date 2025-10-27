@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Salah2Eddin/go-http/pkg/httpheader"
+	"github.com/Salah2Eddin/go-http/pkg/httpheaders"
 	"github.com/Salah2Eddin/go-http/pkg/request"
 	"github.com/Salah2Eddin/go-http/pkg/response"
 	"github.com/Salah2Eddin/go-http/pkg/server"
@@ -13,7 +13,7 @@ func index(request *request.Request) (*response.Response, error) {
 
 	id := request.Uri().GetSegments()[2]
 
-	headers := httpheader.New()
+	headers := httpheaders.New()
 	headers.AddFromString("content-type", "text/html")
 
 	var body []byte

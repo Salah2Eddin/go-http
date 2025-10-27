@@ -1,4 +1,4 @@
-package httpheader
+package httpheaders
 
 type Header struct {
 	name   string

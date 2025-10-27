@@ -1,4 +1,4 @@
-package httpheader
+package httpheaders
 
 import "github.com/Salah2Eddin/go-http/pkg/util/charutil"
 

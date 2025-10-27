@@ -2,7 +2,7 @@ package readers
 
 import (
 	"bufio"
-	"github.com/Salah2Eddin/go-http/pkg/httpheader"
+	"github.com/Salah2Eddin/go-http/pkg/httpheaders"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/reqline"
 	"github.com/Salah2Eddin/go-http/pkg/request"
@@ -21,7 +21,7 @@ func NewRequestReader() RequestReader {
 	}
 }
 
-func (r RequestReader) bodyReaderFactory(headers *httpheader.Headers) (iReader, error) {
+func (r RequestReader) bodyReaderFactory(headers *httpheaders.Headers) (iReader, error) {
 	//TODO: other body reading strategies
 	if val, exists := headers.Get("transfer-encoding"); exists {
 		return nil, pkgerrors.ErrUnsupportedBodyTransferEncoding{}
@@ -47,7 +47,7 @@ func (r RequestReader) Parse(reader *bufio.Reader) (*request.Request, error) {
 	}
 
 	headersBuf, err := r.headersReader.Read(reader)
-	headers, err := httpheader.ParseRequestHeaders(headersBuf)
+	headers, err := httpheaders.ParseRequestHeaders(headersBuf)
 	if err != nil {
 		return nil, err
 	}

@@ -1,4 +1,4 @@
-package httpheader
+package httpheaders
 
 import (
 	"bytes"
