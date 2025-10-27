@@ -24,7 +24,7 @@ func index(request *request.Request) (*response.Response, error) {
 	}
 
 	body = append(body, []byte(fmt.Sprintf("<h1>Your ID is %s</h1>", id))...)
-	resp := response.NewResponse(status, headers, &body)
+	resp := response.NewResponse(status, headers, body)
 	return resp, nil
 }
 

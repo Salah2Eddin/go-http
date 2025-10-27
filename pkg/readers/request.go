@@ -65,6 +65,6 @@ func (r RequestReader) Parse(reader *bufio.Reader) (*request.Request, error) {
 	req := request.NewRequest(
 		reqLine,
 		headers,
-		&body)
+		body)
 	return &req, nil
 }
