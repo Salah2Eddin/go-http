@@ -26,7 +26,7 @@ type Server struct {
 // NewServer creates and initializes a new Server instance with the provided address or a default address if nil.
 func NewServer(address *Address) *Server {
 	if address == nil {
-		address = &Address{} // Default address
+		address = &Address{Port: "8576"} // Default address
 	}
 
 	// Initialize the server with address and router in one statement
