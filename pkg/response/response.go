@@ -14,7 +14,7 @@ func NewEmptyResponse(line *StatusLine) *Response {
 	body := make([]byte, 0)
 	return &Response{
 		Line:    line,
-		Headers: &httpheaders.Headers{},
+		Headers: httpheaders.New(),
 		Body:    &body,
 	}
 }
