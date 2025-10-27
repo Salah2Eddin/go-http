@@ -2,17 +2,17 @@ package readers
 
 import "bufio"
 
-func checkCRLF(bytes []byte) bool {
-	size := len(bytes)
+func checkCRLF(bytes *[]byte) bool {
+	size := len(*bytes)
 	if size < 2 {
 		return false
 	}
 
-	return bytes[size-2] == '\r' && bytes[size-1] == '\n'
+	return (*bytes)[size-2] == '\r' && (*bytes)[size-1] == '\n'
 }
 
 func readLine(reader *bufio.Reader, buf *[]byte) error {
-	for !checkCRLF(*buf) {
+	for !checkCRLF(buf) {
 		next, err := reader.ReadByte()
 		if err != nil {
 			return err
@@ -26,6 +26,6 @@ func readLine(reader *bufio.Reader, buf *[]byte) error {
 	return nil
 }
 
-func checkHeadersEnd(bytes []byte) bool {
-	return len(bytes) == 0
+func checkHeadersEnd(bytes *[]byte) bool {
+	return len(*bytes) == 0
 }

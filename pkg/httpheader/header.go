@@ -2,20 +2,20 @@ package httpheader
 
 type Header struct {
 	name   string
-	values []Value
+	values *[]Value
 }
 
-func NewHeader(name string, values []Value) Header {
-	return Header{
+func NewHeader(name string, values *[]Value) *Header {
+	return &Header{
 		name:   name,
 		values: values,
 	}
 }
 
-func NewHeaderFromString(name string, value string) (Header, error) {
+func NewHeaderFromString(name string, value string) (*Header, error) {
 	values, err := processHeaderValues([]byte(value))
 	if err != nil {
-		return Header{}, err
+		return nil, err
 	}
 	return NewHeader(name, values), err
 }
@@ -24,16 +24,14 @@ func (h *Header) Name() string {
 	return h.name
 }
 
-func (h *Header) Values() []Value {
+func (h *Header) Values() *[]Value {
 	return h.values
 }
 
 func (h *Header) AddValue(value Value) {
-	h.values = append(h.values, value)
+	*h.values = append(*h.values, value)
 }
 
-func (h *Header) AddValues(values []Value) {
-	for _, value := range values {
-		h.values = append(h.values, value)
-	}
+func (h *Header) AddValues(values *[]Value) {
+	*h.values = append(*h.values, *values...)
 }

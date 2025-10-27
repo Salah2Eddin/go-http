@@ -5,12 +5,11 @@ import (
 	"github.com/Salah2Eddin/go-http/pkg/httpheader"
 	"github.com/Salah2Eddin/go-http/pkg/request"
 	"github.com/Salah2Eddin/go-http/pkg/response"
-	"github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
 	"github.com/Salah2Eddin/go-http/pkg/server"
 )
 
 func index(request *request.Request) (*response.Response, error) {
-	status := statuscodes.Status200()
+	status := response.Status200()
 
 	id := request.Uri().GetSegments()[2]
 

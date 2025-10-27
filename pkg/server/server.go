@@ -8,7 +8,6 @@ import (
 	"github.com/Salah2Eddin/go-http/pkg/readers"
 	"github.com/Salah2Eddin/go-http/pkg/request"
 	"github.com/Salah2Eddin/go-http/pkg/response"
-	"github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
 	"github.com/Salah2Eddin/go-http/pkg/router"
 	"github.com/Salah2Eddin/go-http/pkg/serializers"
 	"github.com/Salah2Eddin/go-http/pkg/uri"
@@ -46,15 +45,15 @@ func (server *Server) AddHandler(uriStr string, method string, handler router.Ha
 
 // Returns the appropriate HTTP status code
 // based on the type of error encountered.
-func mapErrorToStatusCode(err error) response.StatusLine {
+func mapErrorToStatusCode(err error) *response.StatusLine {
 	switch err.(type) {
 	// ErrExpectedEmptyBody indicates that a request body was received when none was expected, which is a client-side error.
 	case pkgerrors.ErrInvalidHeader, pkgerrors.ErrInvalidRequestLine, pkgerrors.ErrExpectedEmptyBody, pkgerrors.ErrMethodNotAllowed:
-		return statuscodes.Status400()
+		return response.Status400()
 	case pkgerrors.ErrRouteNotFound:
-		return statuscodes.Status404()
+		return response.Status404()
 	default:
-		return statuscodes.Status500()
+		return response.Status500()
 	}
 }
 
@@ -103,7 +102,7 @@ func (server *Server) processConnection(conn net.Conn) {
 
 	req, err := server.reader.Parse(reader)
 
-	res := server.handle(&req, err)
+	res := server.handle(req, err)
 
 	buf := bytes.Buffer{}
 	server.serializer.Serialize(res, &buf)

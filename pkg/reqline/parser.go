@@ -15,11 +15,11 @@ func validRequestLine(parts []string) bool {
 	return strings.HasPrefix(httpVer, "HTTP/")
 }
 
-func ParseRequestLine(requestLineBytes []byte) (RequestLine, error) {
+func ParseRequestLine(requestLineBytes []byte) (*RequestLine, error) {
 
 	// Request line must contain bytes in the ASCII range only (RFC9112 2.2)
 	if !charutil.ValidateAsciiEncoding(requestLineBytes) {
-		return RequestLine{}, pkgerrors.ErrInvalidRequestLine{}
+		return nil, pkgerrors.ErrInvalidRequestLine{}
 	}
 
 	requestLine := string(requestLineBytes)
@@ -27,7 +27,7 @@ func ParseRequestLine(requestLineBytes []byte) (RequestLine, error) {
 	parts := strings.Fields(requestLine)
 
 	if !validRequestLine(parts) {
-		return RequestLine{}, pkgerrors.ErrInvalidRequestLine{}
+		return nil, pkgerrors.ErrInvalidRequestLine{}
 	}
 
 	method := parts[0]
@@ -35,12 +35,13 @@ func ParseRequestLine(requestLineBytes []byte) (RequestLine, error) {
 	httpVer := parts[2]
 
 	if !uri.ValidateURI(uriString) {
-		return RequestLine{}, &pkgerrors.ErrInvalidUri{Uri: uriString}
+		return nil, pkgerrors.ErrInvalidUri{Uri: uriString}
 	}
 
-	return NewRequestLine(
+	line := NewRequestLine(
 		method,                // method
 		uri.NewUri(uriString), // path
 		httpVer,               // http version
-	), nil
+	)
+	return line, nil
 }
