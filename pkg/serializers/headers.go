@@ -2,16 +2,16 @@ package serializers
 
 import (
 	"bytes"
-	"github.com/Salah2Eddin/go-http/pkg/httpheader"
+	"github.com/Salah2Eddin/go-http/pkg/httpheaders"
 )
 
 type HeadersSerializer struct {
 	headerSerializer HeaderSerializer
 }
 
-func (h HeadersSerializer) Serialize(headers *httpheader.Headers, buf *bytes.Buffer) {
+func (h HeadersSerializer) Serialize(headers *httpheaders.Headers, buf *bytes.Buffer) {
 	for _, header := range headers.Headers() {
-		h.headerSerializer.Serialize(&header, buf)
+		h.headerSerializer.Serialize(header, buf)
 	}
 	buf.WriteString("\r\n")
 }
@@ -19,7 +19,7 @@ func (h HeadersSerializer) Serialize(headers *httpheader.Headers, buf *bytes.Buf
 type HeaderSerializer struct {
 }
 
-func (HeaderSerializer) Serialize(header *httpheader.Header, buf *bytes.Buffer) {
+func (HeaderSerializer) Serialize(header *httpheaders.Header, buf *bytes.Buffer) {
 	buf.WriteString(header.Name())
 	buf.WriteString(": ")
 
@@ -32,7 +32,7 @@ func (HeaderSerializer) Serialize(header *httpheader.Header, buf *bytes.Buffer) 
 		}
 		formatter := formatterFactory(header.Name())
 		valueSerializer.SetFormatter(formatter)
-		valueSerializer.Serialize(&values[i], buf)
+		valueSerializer.Serialize(values[i], buf)
 	}
 }
 
@@ -44,7 +44,7 @@ func (serializer *ValueSerializer) SetFormatter(formatter IValueFormatter) {
 	serializer.formatter = formatter
 }
 
-func (serializer *ValueSerializer) Serialize(v *httpheader.Value, buf *bytes.Buffer) {
+func (serializer *ValueSerializer) Serialize(v *httpheaders.Value, buf *bytes.Buffer) {
 	// Write main value
 	buf.WriteString(serializer.formatter.format(v.Value()))
 

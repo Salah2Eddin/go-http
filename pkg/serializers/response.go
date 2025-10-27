@@ -18,8 +18,8 @@ func NewResponseSerializer() ResponseSerializer {
 }
 
 func (r ResponseSerializer) Serialize(resp *response.Response, buf *bytes.Buffer) {
-	r.statusSerializer.Serialize(&resp.Line, buf)
-	r.headersSerializer.Serialize(&resp.Headers, buf)
+	r.statusSerializer.Serialize(resp.Line, buf)
+	r.headersSerializer.Serialize(resp.Headers, buf)
 
 	// Empty line between headers and body
 	buf.WriteString("\r\n")

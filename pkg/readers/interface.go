@@ -4,6 +4,6 @@ import (
 	"bufio"
 )
 
-type iReader[T any] interface {
+type iReader interface {
 	Read(reader *bufio.Reader) ([]byte, error)
 }

@@ -28,10 +28,11 @@ func (err ErrInvalidContentLength) Error() string {
 }
 
 type ErrIncorrectContentLength struct {
+	Cause error
 }
 
 func (err ErrIncorrectContentLength) Error() string {
-	return fmt.Sprintf("Request body's length doesn't equal content-length")
+	return fmt.Sprintf("Incorrect content length: %v", err.Cause)
 }
 
 type ErrExpectedEmptyBody struct{}

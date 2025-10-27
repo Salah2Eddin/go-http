@@ -1,4 +1,4 @@
-package httpheader
+package httpheaders
 
 import (
 	"bytes"
@@ -9,15 +9,15 @@ type Value struct {
 	params map[string]string
 }
 
-func NewHeaderValues(value string) []Value {
+func NewHeaderValues(value string) []*Value {
 	values, err := processHeaderValues([]byte(value))
 	if err != nil {
-		return []Value{}
+		return nil
 	}
 	return values
 }
 
-func NewHeaderValueFromBytes(valueByte []byte, paramsBytes []byte) Value {
+func NewHeaderValueFromBytes(valueByte []byte, paramsBytes []byte) *Value {
 	value := string(valueByte)
 	params := make(map[string]string)
 	for _, param := range bytes.Split(paramsBytes, []byte(";")) {
@@ -27,7 +27,7 @@ func NewHeaderValueFromBytes(valueByte []byte, paramsBytes []byte) Value {
 		}
 		params[string(k)] = string(v)
 	}
-	return Value{
+	return &Value{
 		value:  value,
 		params: params,
 	}

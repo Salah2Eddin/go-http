@@ -1,4 +1,4 @@
-package httpheader
+package httpheaders
 
 import (
 	"bytes"
@@ -201,12 +201,12 @@ func splitHeaderValues(valueBytes []byte) ([][]byte, [][]byte, error) {
 	return values, params, nil
 }
 
-func processHeaderValues(valueBytes []byte) ([]Value, error) {
+func processHeaderValues(valueBytes []byte) ([]*Value, error) {
 	values, params, err := splitHeaderValues(valueBytes)
 	if err != nil {
 		return nil, err
 	}
-	headerValues := make([]Value, 0)
+	headerValues := make([]*Value, 0)
 	for i := range values {
 		// Empty elements do not contribute to the count of elements present.
 		// RFC9110 5.6.1.2
@@ -221,7 +221,7 @@ func processHeaderValues(valueBytes []byte) ([]Value, error) {
 		RFC9110 5.6.1.2
 	*/
 	if len(values) == 0 {
-		return nil, &pkgerrors.ErrInvalidHeader{}
+		return nil, pkgerrors.ErrInvalidHeader{}
 	}
 
 	return headerValues, nil
@@ -234,27 +234,27 @@ func nameValueSplit(headerLineBytes []byte) ([]byte, []byte, bool) {
 	return bytes.Cut(headerLineBytes, []byte{COLON})
 }
 
-func parseHeaderLine(headerLineBytes []byte) (Header, error) {
+func parseHeaderLine(headerLineBytes []byte) (*Header, error) {
 	nameBytes, valueBytes, found := nameValueSplit(headerLineBytes)
 	if !found || !validHeaderName(nameBytes) || !validHeaderValue(valueBytes) {
-		return Header{}, pkgerrors.ErrInvalidHeader{}
+		return nil, pkgerrors.ErrInvalidHeader{}
 	}
 
 	name := processHeaderName(nameBytes)
 	values, err := processHeaderValues(valueBytes)
 	if err != nil {
-		return Header{}, pkgerrors.ErrInvalidHeader{}
+		return nil, pkgerrors.ErrInvalidHeader{}
 	}
 	header := NewHeader(name, values)
 	return header, nil
 }
 
-func ParseRequestHeaders(lines [][]byte) (Headers, error) {
+func ParseRequestHeaders(lines [][]byte) (*Headers, error) {
 	headers := New()
 	for _, line := range lines {
 		header, err := parseHeaderLine(line)
 		if err != nil {
-			return Headers{}, err
+			return nil, err
 		}
 		headers.AddFromHeader(header)
 	}

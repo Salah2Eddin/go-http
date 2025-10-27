@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/readers"
+	"github.com/Salah2Eddin/go-http/pkg/request"
 	"github.com/Salah2Eddin/go-http/pkg/response"
-	"github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
 	"github.com/Salah2Eddin/go-http/pkg/router"
 	"github.com/Salah2Eddin/go-http/pkg/serializers"
 	"github.com/Salah2Eddin/go-http/pkg/uri"
@@ -16,53 +16,44 @@ import (
 )
 
 type Server struct {
-	router     router.Router
-	addr       Address
+	router     *router.Router
+	addr       *Address
 	reader     readers.RequestReader
 	serializer serializers.ResponseSerializer
 }
 
 // NewServer creates and initializes a new Server instance with the provided address or a default address if nil.
-func NewServer(address *Address) Server {
+func NewServer(address *Address) *Server {
 	if address == nil {
-		address = &Address{} // Default address
+		address = &Address{Port: "8576"} // Default address
 	}
 
 	// Initialize the server with address and router in one statement
-	return Server{
-		addr:       *address,
+	return &Server{
+		addr:       address,
 		router:     router.NewRouter(),
 		serializer: serializers.NewResponseSerializer(),
+		reader:     readers.NewRequestReader(),
 	}
-}
-
-func (server *Server) getOrCreateRoute(uri uri.Uri) router.Route {
-	route, err := server.router.GetRoute(uri, false)
-	if err != nil {
-		route, err = server.router.NewRoute(uri)
-		if err != nil {
-			panic(err)
-		}
-	}
-	return route
 }
 
 // AddHandler Registers a new handler for the given URI and HTTP method.
 // If the route corresponding to the URI does not exist, a new route is created.
-func (server *Server) AddHandler(uriStr string, method string, handler router.Handler) {
-	route := server.getOrCreateRoute(uri.NewUri(uriStr))
-	route.AddHandler(method, handler)
+func (server *Server) AddHandler(uriStr string, method string, handler router.Handler) error {
+	return server.router.AddHandler(uri.NewUri(uriStr), method, handler)
 }
 
 // Returns the appropriate HTTP status code
 // based on the type of error encountered.
-func mapErrorToStatusCode(err error) response.StatusLine {
+func mapErrorToStatusCode(err error) *response.StatusLine {
 	switch err.(type) {
 	// ErrExpectedEmptyBody indicates that a request body was received when none was expected, which is a client-side error.
-	case pkgerrors.ErrInvalidHeader, pkgerrors.ErrInvalidRequestLine, pkgerrors.ErrExpectedEmptyBody:
-		return statuscodes.Status400()
+	case pkgerrors.ErrInvalidHeader, pkgerrors.ErrInvalidRequestLine, pkgerrors.ErrExpectedEmptyBody, pkgerrors.ErrMethodNotAllowed:
+		return response.Status400()
+	case pkgerrors.ErrRouteNotFound:
+		return response.Status404()
 	default:
-		return statuscodes.Status500()
+		return response.Status500()
 	}
 }
 
@@ -80,6 +71,28 @@ func closeListener(listener net.Listener) {
 	}
 }
 
+func (*Server) handleError(err error) *response.Response {
+	return response.NewEmptyResponse(mapErrorToStatusCode(err))
+}
+
+func (server *Server) handle(req *request.Request, err error) *response.Response {
+	if err != nil {
+		return server.handleError(err)
+	}
+
+	handler, err := server.router.GetRequestHandler(req.Uri(), req.Method())
+	if err != nil {
+		return server.handleError(err)
+	}
+
+	res, err := handler(req)
+	if err != nil {
+		return server.handleError(err)
+	}
+
+	return res
+}
+
 // Handles an incoming client connection.
 // It reads and parses the request, processes it, writes the response,
 // and then closes the connection.
@@ -89,16 +102,10 @@ func (server *Server) processConnection(conn net.Conn) {
 
 	req, err := server.reader.Parse(reader)
 
-	// TODO: Do something better here
-	var res response.Response
-	if err != nil {
-		res = response.NewEmptyResponse(mapErrorToStatusCode(err))
-	} else {
-		res = server.router.RouteRequest(req)
-	}
+	res := server.handle(req, err)
 
 	buf := bytes.Buffer{}
-	server.serializer.Serialize(&res, &buf)
+	server.serializer.Serialize(res, &buf)
 
 	_, err = conn.Write(buf.Bytes())
 	if err != nil {
