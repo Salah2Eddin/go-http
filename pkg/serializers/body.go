@@ -11,9 +11,12 @@ var bodySerializers = map[string]ISerializer[[]byte]{
 }
 
 func bodySerializerFactory(resp *response.Response) ISerializer[[]byte] {
-	encoding, _ := resp.Headers.Get("transfer-encoding")
-	if serializer, ok := bodySerializers[encoding.Name()]; ok {
-		return serializer
+	encoding, exists := resp.Headers.Get("transfer-encoding")
+	if exists {
+		serializer, ok := bodySerializers[encoding.Name()]
+		if ok {
+			return serializer
+		}
 	}
 	return bodySerializers["default"]
 }
