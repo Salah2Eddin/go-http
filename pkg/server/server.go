@@ -16,6 +16,8 @@ import (
 	"strings"
 )
 
+const HTTPVersion = "HTTP/1.0"
+
 type Server struct {
 	router     *router.Router
 	addr       *Address
@@ -32,11 +34,7 @@ func errorToResponse(err *pkgerrors.AppError) *response.Response {
 	}
 	buf := []byte(err.Error())
 	resp := response.NewResponse(
-		&response.StatusLine{
-			Version: "HTTP/1.0",
-			Code:    err.HTTPStatusCode(),
-			Phrase:  "",
-		},
+		response.NewStatusLine(HTTPVersion, err.HTTPStatusCode(), ""),
 		headers,
 		buf,
 	)
