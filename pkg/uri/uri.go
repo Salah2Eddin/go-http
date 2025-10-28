@@ -23,7 +23,10 @@ func NewUri(fullUri string) *Uri {
 
 // String returns the path component of the Uri as a string.
 func (u Uri) String() string {
-	uri := u.scheme + "://"
+	var uri string
+	if u.scheme != "" {
+		uri = u.scheme + "://"
+	}
 	if u.userInfo != "" {
 		uri += u.userInfo + "@"
 	}
