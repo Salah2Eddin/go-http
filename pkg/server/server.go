@@ -23,27 +23,6 @@ type Server struct {
 	serializer serializers.ResponseSerializer
 }
 
-// NewServer creates and initializes a new Server instance with the provided address or a default address if nil.
-func NewServer(address *Address) *Server {
-	if address == nil {
-		address = &Address{Port: "8576"} // Default address
-	}
-
-	// Initialize the server with address and router in one statement
-	return &Server{
-		addr:       address,
-		router:     router.NewRouter(),
-		serializer: serializers.NewResponseSerializer(),
-		reader:     readers.NewRequestReader(),
-	}
-}
-
-// AddHandler Registers a new handler for the given URI and HTTP method.
-// If the route corresponding to the URI does not exist, a new route is created.
-func (server *Server) AddHandler(uriStr string, method string, handler router.Handler) error {
-	return server.router.AddHandler(uri.NewUri(uriStr), method, handler)
-}
-
 func errorToResponse(err *pkgerrors.AppError) *response.Response {
 	// buf := []byte(err.Error())
 	headers := httpheaders.New()
@@ -76,6 +55,27 @@ func closeListener(listener net.Listener) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+// NewServer creates and initializes a new Server instance with the provided address or a default address if nil.
+func NewServer(address *Address) *Server {
+	if address == nil {
+		address = &Address{Port: "8576"} // Default address
+	}
+
+	// Initialize the server with address and router in one statement
+	return &Server{
+		addr:       address,
+		router:     router.NewRouter(),
+		serializer: serializers.NewResponseSerializer(),
+		reader:     readers.NewRequestReader(),
+	}
+}
+
+// AddHandler Registers a new handler for the given URI and HTTP method.
+// If the route corresponding to the URI does not exist, a new route is created.
+func (server *Server) AddHandler(uriStr string, method string, handler router.Handler) error {
+	return server.router.AddHandler(uri.NewUri(uriStr), method, handler)
 }
 
 func (*Server) handleError(err *pkgerrors.AppError) *response.Response {
