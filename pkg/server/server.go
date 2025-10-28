@@ -44,7 +44,7 @@ func (server *Server) AddHandler(uriStr string, method string, handler router.Ha
 	return server.router.AddHandler(uri.NewUri(uriStr), method, handler)
 }
 
-func ErrorToResponse(err *pkgerrors.AppError) *response.Response {
+func errorToResponse(err *pkgerrors.AppError) *response.Response {
 	// buf := []byte(err.Error())
 	headers := httpheaders.New()
 	err2 := headers.AddFromString("content-type", "text/plain; charset=utf-8")
@@ -79,7 +79,7 @@ func closeListener(listener net.Listener) {
 }
 
 func (*Server) handleError(err *pkgerrors.AppError) *response.Response {
-	return ErrorToResponse(err)
+	return errorToResponse(err)
 }
 
 func (server *Server) handle(req *request.Request, err *pkgerrors.AppError) *response.Response {
