@@ -9,7 +9,11 @@ import (
 )
 
 func index(request *request.Request) (*response.Response, error) {
-	status := response.Status200()
+	status := &response.StatusLine{
+		Version: "HTTP/1.0",
+		Code:    "200",
+		Phrase:  "OK",
+	}
 
 	id := request.Uri().GetSegments()[2]
 
