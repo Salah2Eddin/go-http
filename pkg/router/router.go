@@ -44,7 +44,11 @@ func (router *Router) getRoute(uri *uri.Uri, allowWildcardInURI bool) (*Route, e
 		return nil, err
 	}
 	// at this point, a route with id is guaranteed to exist
-	return router.routes[id], nil
+	route, ok := router.routes[id]
+	if !ok {
+		return nil, pkgerrors.ErrRouteNotFound{Route: uri.String()}
+	}
+	return route, nil
 }
 
 // AddHandler Registers a new handler for the given URI and HTTP method.
