@@ -46,7 +46,7 @@ func (tree *RoutesTree) find(uri *uri.Uri, allowWildcardInURI bool) (int, error)
 				next = current.wildcard()
 			}
 			if next == nil {
-				return routeNotFoundID, pkgerrors.ErrRouteNotFound{}
+				return routeNotFoundID, pkgerrors.ErrRouteNotFound{Route: uri.String()}
 			}
 		}
 		current = next
