@@ -26,11 +26,11 @@ type Server struct {
 func errorToResponse(err *pkgerrors.AppError) *response.Response {
 	// buf := []byte(err.Error())
 	headers := httpheaders.New()
-	err2 := headers.AddFromString("content-type", "text/plain; charset=utf-8")
+	err2 := headers.AddFromString("content-type", "application/json")
 	if err2 != nil {
 		headers = &httpheaders.Headers{}
 	}
-	buf := make([]byte, 0)
+	buf := []byte(err.Error())
 	resp := response.NewResponse(
 		&response.StatusLine{
 			Version: "HTTP/1.0",
