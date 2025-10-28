@@ -82,33 +82,34 @@ func (*Server) handleError(err *pkgerrors.AppError) *response.Response {
 	return errorToResponse(err)
 }
 
-func (server *Server) handle(req *request.Request, err *pkgerrors.AppError) *response.Response {
-	if err != nil {
-		return server.handleError(err)
+func (server *Server) handle(req *request.Request) *response.Response {
+	handler, routerError := server.router.GetRequestHandler(req.Uri(), req.Method())
+	if routerError != nil {
+		return server.handleError(routerError)
 	}
-
-	handler, err := server.router.GetRequestHandler(req.Uri(), req.Method())
-	if err != nil {
-		return server.handleError(err)
-	}
-	res, e := handler(req)
-	if e != nil {
-		return server.handleError(pkgerrors.NewAppError(e))
+	res, handlerError := handler(req)
+	if handlerError != nil {
+		return server.handleError(pkgerrors.NewAppError(handlerError))
 	}
 
 	return res
 }
 
-// Handles an incoming client connection.
-// It reads and parses the request, processes it, writes the response,
+// processConnection Handles an incoming client connection.
+// It reads and parses the request, handles it, writes the response to the stream,
 // and then closes the connection.
 func (server *Server) processConnection(conn net.Conn) {
 	defer closeConn(conn)
 	reader := bufio.NewReader(conn)
 
-	req, err := server.reader.Parse(reader)
+	req, parseError := server.reader.Parse(reader)
 
-	res := server.handle(req, err)
+	var res *response.Response
+	if parseError != nil {
+		res = server.handleError(parseError)
+	} else {
+		res = server.handle(req)
+	}
 
 	buf := bytes.Buffer{}
 	server.serializer.Serialize(res, &buf)
