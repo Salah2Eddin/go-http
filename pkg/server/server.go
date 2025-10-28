@@ -115,7 +115,7 @@ func (server *Server) processConnection(conn net.Conn) {
 
 	_, writeError := conn.Write(buf.Bytes())
 	if writeError != nil {
-		fmt.Printf("Error writing to conn %s:%s\n", conn.RemoteAddr(), err.Error())
+		fmt.Printf("Error writing to conn %s:%s\n", conn.RemoteAddr(), writeError.Error())
 	}
 }
 
