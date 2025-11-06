@@ -4,7 +4,6 @@ import "errors"
 
 type AppError struct {
 	wrapped error
-	code    int
 }
 
 func NewAppError(wrapped error) *AppError {
