@@ -3,6 +3,7 @@ package serializers
 import (
 	"bytes"
 	"github.com/Salah2Eddin/go-http/pkg/response"
+	"strconv"
 )
 
 type ResponseSerializer struct {
@@ -33,7 +34,7 @@ type StatusLineSerializer struct{}
 func (StatusLineSerializer) Serialize(status *response.StatusLine, buf *bytes.Buffer) {
 	buf.WriteString(status.Version)
 	buf.WriteByte(' ')
-	buf.WriteString(status.Code)
+	buf.WriteString(strconv.Itoa(status.Code))
 	buf.WriteByte(' ')
 	buf.WriteString(status.Phrase)
 	buf.WriteString("\r\n")
