@@ -30,7 +30,7 @@ func errorToResponse(err *pkgerrors.AppError) *response.Response {
 	// Ignore the potential error as the content-type is not critical
 	_ = headers.AddFromString("content-type", "application/json")
 
-	buf := []byte(err.Error())
+	buf := []byte(fmt.Sprintf(`{"error":%q}`, err.Error()))
 	resp := response.NewResponse(
 		response.NewStatusLine(HTTPVersion, err.HTTPStatusCode()),
 		headers,
