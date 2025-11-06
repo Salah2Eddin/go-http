@@ -48,6 +48,8 @@ func (u Uri) String() string {
 	if u.fragment != "" {
 		uri += "#" + u.fragment
 	}
+	// cache the uri
+	u.uri = uri
 	return uri
 }
 
