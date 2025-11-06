@@ -25,7 +25,7 @@ func generateRollingHasher(prime int, mod int) hasher {
 }
 
 func getHasher(prime int) hasher {
-	// 1e9+7 is a large well known hashingPrime
+	// 1e9+7 is a large well known prime
 	// used widely for modulo operations in hashing
 	primeMod := int(1e9 + 7)
 	return generateRollingHasher(prime, primeMod)
