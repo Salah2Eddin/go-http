@@ -236,8 +236,12 @@ func nameValueSplit(headerLineBytes []byte) ([]byte, []byte, bool) {
 
 func parseHeaderLine(headerLineBytes []byte) (*Header, error) {
 	nameBytes, valueBytes, found := nameValueSplit(headerLineBytes)
-	if !found || !validHeaderName(nameBytes) || !validHeaderValue(valueBytes) {
-		return nil, pkgerrors.ErrInvalidHeader{Reason: "Reason"}
+	if !found {
+		return nil, pkgerrors.ErrInvalidHeader{Reason: "Header line name and value delimiter not found"}
+	} else if !validHeaderName(nameBytes) {
+		return nil, pkgerrors.ErrInvalidHeader{Reason: "Invalid header name"}
+	} else if !validHeaderValue(valueBytes) {
+		return nil, pkgerrors.ErrInvalidHeader{Reason: "Invalid header value"}
 	}
 
 	name := processHeaderName(nameBytes)
