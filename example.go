@@ -15,7 +15,10 @@ func index(request *request.Request) (*response.Response, pkgerrors.HTTPError) {
 	id := request.Uri().GetSegments()[2]
 
 	headers := httpheaders.New()
-	headers.AddFromString("content-type", "text/html")
+	err := headers.AddFromString("content-type", "text/html")
+	if err != nil {
+		return nil, nil
+	}
 
 	var body []byte
 	if name, exists := request.GetUriParameter("name"); exists {
@@ -31,7 +34,10 @@ func index(request *request.Request) (*response.Response, pkgerrors.HTTPError) {
 
 func main() {
 	app := server.NewServer(&server.Address{IP: "127.0.0.1", Port: "8008"})
-	app.AddHandler("/id/*", "GET", index)
+	err := app.AddHandler("/id/*", "GET", index)
+	if err != nil {
+		panic(err)
+	}
 
 	app.Start()
 }
