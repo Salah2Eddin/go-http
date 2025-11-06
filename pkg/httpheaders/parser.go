@@ -144,7 +144,7 @@ func parseQuotedValue(reader *bytes.Reader) ([]byte, error) {
 			value = append(value, b)
 		}
 	}
-	return nil, &pkgerrors.ErrInvalidHeader{Reason: "Quoted value never closed"}
+	return nil, pkgerrors.ErrInvalidHeader{Reason: "Quoted value never closed"}
 }
 
 func parseNextValue(reader *bytes.Reader) ([]byte, []byte, error) {
