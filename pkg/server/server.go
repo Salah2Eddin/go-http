@@ -27,8 +27,9 @@ type Server struct {
 
 func errorToResponse(err *pkgerrors.AppError) *response.Response {
 	headers := httpheaders.New()
-	// Ignore the potential error as the content-type is not critical
-	_ = headers.AddFromString("content-type", "application/json")
+	if err := headers.AddFromString("content-type", "application/json"); err != nil {
+		panic(fmt.Sprintf("Failed to set static header: %q", err))
+	}
 
 	buf := []byte(fmt.Sprintf(`{"error":%q}`, err.Error()))
 	resp := response.NewResponse(
