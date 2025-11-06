@@ -3,13 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/Salah2Eddin/go-http/pkg/httpheaders"
-	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/request"
 	"github.com/Salah2Eddin/go-http/pkg/response"
 	"github.com/Salah2Eddin/go-http/pkg/server"
 )
 
-func index(request *request.Request) (*response.Response, pkgerrors.HTTPError) {
+func index(request *request.Request) (*response.Response, error) {
 	status := response.NewStatusLine(server.HTTPVersion, 200)
 
 	id := request.Uri().GetSegments()[2]
@@ -17,7 +16,7 @@ func index(request *request.Request) (*response.Response, pkgerrors.HTTPError) {
 	headers := httpheaders.New()
 	err := headers.AddFromString("content-type", "text/html")
 	if err != nil {
-		return nil, pkgerrors.NewAppError(err)
+		return nil, err
 	}
 
 	var body []byte
