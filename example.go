@@ -10,15 +10,15 @@ import (
 )
 
 func index(request *request.Request) (*response.Response, pkgerrors.HTTPError) {
-	status := response.NewStatusLine(server.HTTPVersion, 200, "OK")
+	status := response.NewStatusLine(server.HTTPVersion, 200)
 
 	id := request.Uri().GetSegments()[2]
 
 	headers := httpheaders.New()
 	err := headers.AddFromString("content-type", "text/html")
-    if err != nil {
-        return nil, pkgerrors.NewAppError(err)
-    }
+	if err != nil {
+		return nil, pkgerrors.NewAppError(err)
+	}
 
 	var body []byte
 	if name, exists := request.GetUriParameter("name"); exists {

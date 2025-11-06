@@ -32,7 +32,7 @@ func errorToResponse(err *pkgerrors.AppError) *response.Response {
 
 	buf := []byte(err.Error())
 	resp := response.NewResponse(
-		response.NewStatusLine(HTTPVersion, err.HTTPStatusCode(), ""),
+		response.NewStatusLine(HTTPVersion, err.HTTPStatusCode()),
 		headers,
 		buf,
 	)
