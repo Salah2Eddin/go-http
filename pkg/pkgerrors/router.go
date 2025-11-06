@@ -24,10 +24,11 @@ func (err ErrRouteNotFound) HTTPStatusCode() int {
 
 type ErrMethodNotAllowed struct {
 	Method string
+	Uri    string
 }
 
 func (err ErrMethodNotAllowed) Error() string {
-	return fmt.Sprintf("Method %s is not allowed", err.Method)
+	return fmt.Sprintf("Method %s is not allowed for URI %s", err.Method, err.Uri)
 }
 
 func (err ErrMethodNotAllowed) HTTPStatusCode() int {
