@@ -28,7 +28,7 @@ type Server struct {
 func errorToResponse(err *pkgerrors.AppError) *response.Response {
 	headers := httpheaders.New()
 	// Ignore the potential error as the content-type is not critical
-	headers.AddFromString("content-type", "application/json")
+	_ = headers.AddFromString("content-type", "application/json")
 
 	buf := []byte(err.Error())
 	resp := response.NewResponse(
