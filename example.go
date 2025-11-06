@@ -16,9 +16,9 @@ func index(request *request.Request) (*response.Response, pkgerrors.HTTPError) {
 
 	headers := httpheaders.New()
 	err := headers.AddFromString("content-type", "text/html")
-	if err != nil {
-		return nil, nil
-	}
+    if err != nil {
+        return nil, pkgerrors.NewAppError(err)
+    }
 
 	var body []byte
 	if name, exists := request.GetUriParameter("name"); exists {
