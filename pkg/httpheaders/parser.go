@@ -34,7 +34,7 @@ func parseUnquotedValue(reader *bytes.Reader) ([]byte, error) {
 			// , works as a value separator only outside parentheses
 			return value, nil
 		} else if b == doubleQuotesByte {
-			return nil, &pkgerrors.ErrInvalidHeader{}
+			return nil, pkgerrors.ErrInvalidHeader{Reason: "Unquoted value contains quotes"}
 		} else if charutil.IsWhiteSpaceASCII(b) {
 			// leading white spaces are ignored
 			if len(value) == 0 {
@@ -90,7 +90,7 @@ func parseParameters(reader *bytes.Reader) ([]byte, error) {
 			}
 			break
 		} else {
-			return nil, &pkgerrors.ErrInvalidHeader{}
+			return nil, pkgerrors.ErrInvalidHeader{Reason: "parameter parsing invalid syntax"}
 		}
 	}
 	return value, nil
@@ -135,7 +135,7 @@ func parseQuotedValue(reader *bytes.Reader) ([]byte, error) {
 					if b == paramSeparatorByte || b == valueSeparatorByte {
 						return value, nil
 					} else {
-						return nil, &pkgerrors.ErrInvalidHeader{}
+						return nil, pkgerrors.ErrInvalidHeader{Reason: "Unquoted value after quoted value"}
 					}
 				}
 				return value, nil
@@ -144,7 +144,7 @@ func parseQuotedValue(reader *bytes.Reader) ([]byte, error) {
 			value = append(value, b)
 		}
 	}
-	return nil, &pkgerrors.ErrInvalidHeader{}
+	return nil, pkgerrors.ErrInvalidHeader{Reason: "Quoted value never closed"}
 }
 
 func parseNextValue(reader *bytes.Reader) ([]byte, []byte, error) {
@@ -183,7 +183,7 @@ func parseNextValue(reader *bytes.Reader) ([]byte, []byte, error) {
 		}
 		return value, params, nil
 	}
-	return nil, nil, &pkgerrors.ErrInvalidHeader{}
+	return nil, nil, pkgerrors.ErrInvalidHeader{Reason: "Header value parsing fails"}
 }
 
 func splitHeaderValues(valueBytes []byte) ([][]byte, [][]byte, error) {
@@ -221,7 +221,7 @@ func processHeaderValues(valueBytes []byte) ([]*Value, error) {
 		RFC9110 5.6.1.2
 	*/
 	if len(values) == 0 {
-		return nil, pkgerrors.ErrInvalidHeader{}
+		return nil, pkgerrors.ErrInvalidHeader{Reason: "No non-empty header values"}
 	}
 
 	return headerValues, nil
@@ -236,14 +236,18 @@ func nameValueSplit(headerLineBytes []byte) ([]byte, []byte, bool) {
 
 func parseHeaderLine(headerLineBytes []byte) (*Header, error) {
 	nameBytes, valueBytes, found := nameValueSplit(headerLineBytes)
-	if !found || !validHeaderName(nameBytes) || !validHeaderValue(valueBytes) {
-		return nil, pkgerrors.ErrInvalidHeader{}
+	if !found {
+		return nil, pkgerrors.ErrInvalidHeader{Reason: "Header line name and value delimiter not found"}
+	} else if !validHeaderName(nameBytes) {
+		return nil, pkgerrors.ErrInvalidHeader{Reason: "Invalid header name"}
+	} else if !validHeaderValue(valueBytes) {
+		return nil, pkgerrors.ErrInvalidHeader{Reason: "Invalid header value"}
 	}
 
 	name := processHeaderName(nameBytes)
 	values, err := processHeaderValues(valueBytes)
 	if err != nil {
-		return nil, pkgerrors.ErrInvalidHeader{}
+		return nil, err
 	}
 	header := NewHeader(name, values)
 	return header, nil

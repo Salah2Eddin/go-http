@@ -26,7 +26,7 @@ func (r RequestReader) bodyReaderFactory(headers *httpheaders.Headers) (iReader,
 	if val, exists := headers.Get("transfer-encoding"); exists {
 		return nil, pkgerrors.ErrUnsupportedBodyTransferEncoding{}
 	} else if val, exists = headers.Get("content-length"); exists {
-		length, err := strconv.Atoi((val.Values())[0].Value())
+		length, err := strconv.Atoi(val.Values()[0].Value())
 		if err != nil {
 			return nil, pkgerrors.ErrInvalidContentLength{}
 		}
@@ -36,29 +36,29 @@ func (r RequestReader) bodyReaderFactory(headers *httpheaders.Headers) (iReader,
 	}
 }
 
-func (r RequestReader) Parse(reader *bufio.Reader) (*request.Request, error) {
+func (r RequestReader) Parse(reader *bufio.Reader) (*request.Request, *pkgerrors.AppError) {
 	reqLineBuf, err := r.reqLineReader.Read(reader)
 	if err != nil {
-		return nil, err
+		return nil, pkgerrors.NewAppError(err)
 	}
 	reqLine, err := reqline.ParseRequestLine(reqLineBuf)
 	if err != nil {
-		return nil, err
+		return nil, pkgerrors.NewAppError(err)
 	}
 
 	headersBuf, err := r.headersReader.Read(reader)
 	headers, err := httpheaders.ParseRequestHeaders(headersBuf)
 	if err != nil {
-		return nil, err
+		return nil, pkgerrors.NewAppError(err)
 	}
 
 	bodyReader, err := r.bodyReaderFactory(headers)
 	if err != nil {
-		return nil, err
+		return nil, pkgerrors.NewAppError(err)
 	}
 	body, err := bodyReader.Read(reader)
 	if err != nil {
-		return nil, err
+		return nil, pkgerrors.NewAppError(err)
 	}
 	// TODO: process body here
 

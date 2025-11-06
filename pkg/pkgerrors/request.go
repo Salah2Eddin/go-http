@@ -2,21 +2,27 @@ package pkgerrors
 
 import "fmt"
 
-type ErrInvalidRoute struct {
-	Uri string
+type ErrInvalidRequestLine struct {
 }
 
-func (err ErrInvalidRoute) Error() string {
-	return fmt.Sprintf("%s doesn't have a handler", err.Uri)
+func (err ErrInvalidRequestLine) Error() string {
+	return "Request is not an HTTP request"
 }
 
-type ErrMethodNotAllowed struct {
-	Method string
-	Uri    string
+func (err ErrInvalidRequestLine) HTTPStatusCode() int {
+	return 400
 }
 
-func (err ErrMethodNotAllowed) Error() string {
-	return fmt.Sprintf("%s %s is not implemented", err.Method, err.Uri)
+type ErrInvalidHeader struct {
+	Reason string
+}
+
+func (err ErrInvalidHeader) Error() string {
+	return fmt.Sprintf("Invalid header line because %s", err.Reason)
+}
+
+func (err ErrInvalidHeader) HTTPStatusCode() int {
+	return 400
 }
 
 type ErrInvalidContentLength struct {
@@ -24,7 +30,11 @@ type ErrInvalidContentLength struct {
 }
 
 func (err ErrInvalidContentLength) Error() string {
-	return fmt.Sprintf("Invalid content length: %s", err.Length)
+	return fmt.Sprintf("%s is an invalid content length", err.Length)
+}
+
+func (err ErrInvalidContentLength) HTTPStatusCode() int {
+	return 400
 }
 
 type ErrIncorrectContentLength struct {
@@ -35,15 +45,27 @@ func (err ErrIncorrectContentLength) Error() string {
 	return fmt.Sprintf("Incorrect content length: %v", err.Cause)
 }
 
+func (err ErrIncorrectContentLength) HTTPStatusCode() int {
+	return 400
+}
+
 type ErrExpectedEmptyBody struct{}
 
-func (e ErrExpectedEmptyBody) Error() string {
+func (err ErrExpectedEmptyBody) Error() string {
 	return fmt.Sprintf("Expected empty body")
+}
+
+func (err ErrExpectedEmptyBody) HTTPStatusCode() int {
+	return 400
 }
 
 type ErrUnsupportedBodyTransferEncoding struct {
 }
 
-func (e ErrUnsupportedBodyTransferEncoding) Error() string {
+func (err ErrUnsupportedBodyTransferEncoding) Error() string {
 	return fmt.Sprintf("Unsupported body transfer encoding")
+}
+
+func (err ErrUnsupportedBodyTransferEncoding) HTTPStatusCode() int {
+	return 400
 }

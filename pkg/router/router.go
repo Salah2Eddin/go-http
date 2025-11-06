@@ -44,7 +44,8 @@ func (router *Router) getRoute(uri *uri.Uri, allowWildcardInURI bool) (*Route, e
 		return nil, err
 	}
 	// at this point, a route with id is guaranteed to exist
-	return router.routes[id], nil
+	route := router.routes[id]
+	return route, nil
 }
 
 // AddHandler Registers a new handler for the given URI and HTTP method.
@@ -59,14 +60,15 @@ func (router *Router) AddHandler(uri *uri.Uri, method string, handler Handler) e
 }
 
 // GetRequestHandler takes an uri and a method and returns the handler associated with them
-func (router *Router) GetRequestHandler(uri *uri.Uri, method string) (Handler, error) {
+func (router *Router) GetRequestHandler(uri *uri.Uri, method string) (Handler, *pkgerrors.AppError) {
 	route, err := router.getRoute(uri, true)
 	if err != nil {
-		return nil, err
+		return nil, pkgerrors.NewAppError(err)
 	}
 	handler := route.GetHandler(method)
 	if handler == nil {
-		return nil, pkgerrors.ErrMethodNotAllowed{Method: method, Uri: uri.String()}
+		return nil, pkgerrors.NewAppError(pkgerrors.ErrMethodNotAllowed{Method: method, Uri: uri.String()})
 	}
+
 	return handler, nil
 }

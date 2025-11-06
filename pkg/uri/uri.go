@@ -22,8 +22,14 @@ func NewUri(fullUri string) *Uri {
 }
 
 // String returns the path component of the Uri as a string.
-func (u Uri) String() string {
-	uri := u.scheme + "://"
+func (u *Uri) String() string {
+	if u.uri != "" {
+		return u.uri
+	}
+	var uri string
+	if u.scheme != "" {
+		uri = u.scheme + "://"
+	}
 	if u.userInfo != "" {
 		uri += u.userInfo + "@"
 	}
@@ -42,16 +48,18 @@ func (u Uri) String() string {
 	if u.fragment != "" {
 		uri += "#" + u.fragment
 	}
+	// cache the uri
+	u.uri = uri
 	return uri
 }
 
 // GetQueryParameter retrieves the value of a query parameter by its name and indicates if it was found in the URI query.
-func (u Uri) GetQueryParameter(param string) (string, bool) {
+func (u *Uri) GetQueryParameter(param string) (string, bool) {
 	value, found := u.query[param]
 	return value, found
 }
 
 // GetSegments splits the URI's path into its individual segments using the path segment delimiter and returns them as a slice.
-func (u Uri) GetSegments() []string {
+func (u *Uri) GetSegments() []string {
 	return strings.Split(u.path, pathSegmentDelimiter)
 }

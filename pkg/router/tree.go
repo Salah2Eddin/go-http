@@ -10,7 +10,7 @@ const routeAlreadyExistsID = -2
 
 //	 hashingPrime
 //		used in hashing for router tree
-//		we need a hashingPrime bigger then character set size.
+//		we need a prime bigger then character set size.
 //		uri charset is ascii which has size 128 (0-127)
 //		so we use first prime > 128
 const hashingPrime = 131
@@ -46,7 +46,7 @@ func (tree *RoutesTree) find(uri *uri.Uri, allowWildcardInURI bool) (int, error)
 				next = current.wildcard()
 			}
 			if next == nil {
-				return routeNotFoundID, pkgerrors.ErrRouteNotFound{}
+				return routeNotFoundID, pkgerrors.ErrRouteNotFound{Route: uri.String()}
 			}
 		}
 		current = next

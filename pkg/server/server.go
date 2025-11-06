@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/Salah2Eddin/go-http/pkg/httpheaders"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/readers"
 	"github.com/Salah2Eddin/go-http/pkg/request"
@@ -15,11 +16,42 @@ import (
 	"strings"
 )
 
+const HTTPVersion = "HTTP/1.0"
+
 type Server struct {
 	router     *router.Router
 	addr       *Address
 	reader     readers.RequestReader
 	serializer serializers.ResponseSerializer
+}
+
+func errorToResponse(err *pkgerrors.AppError) *response.Response {
+	headers := httpheaders.New()
+	if err := headers.AddFromString("content-type", "application/json"); err != nil {
+		panic(fmt.Sprintf("Failed to set static header: %q", err))
+	}
+
+	buf := []byte(fmt.Sprintf(`{"error":%q}`, err.Error()))
+	resp := response.NewResponse(
+		response.NewStatusLine(HTTPVersion, err.HTTPStatusCode()),
+		headers,
+		buf,
+	)
+	return resp
+}
+
+func closeConn(conn net.Conn) {
+	err := conn.Close()
+	if err != nil {
+		fmt.Printf("Failed to close connection: %s\n", conn.RemoteAddr().String())
+	}
+}
+
+func closeListener(listener net.Listener) {
+	err := listener.Close()
+	if err != nil {
+		panic(err)
+	}
 }
 
 // NewServer creates and initializes a new Server instance with the provided address or a default address if nil.
@@ -43,73 +75,45 @@ func (server *Server) AddHandler(uriStr string, method string, handler router.Ha
 	return server.router.AddHandler(uri.NewUri(uriStr), method, handler)
 }
 
-// Returns the appropriate HTTP status code
-// based on the type of error encountered.
-func mapErrorToStatusCode(err error) *response.StatusLine {
-	switch err.(type) {
-	// ErrExpectedEmptyBody indicates that a request body was received when none was expected, which is a client-side error.
-	case pkgerrors.ErrInvalidHeader, pkgerrors.ErrInvalidRequestLine, pkgerrors.ErrExpectedEmptyBody, pkgerrors.ErrMethodNotAllowed:
-		return response.Status400()
-	case pkgerrors.ErrRouteNotFound:
-		return response.Status404()
-	default:
-		return response.Status500()
-	}
+func (*Server) handleError(err *pkgerrors.AppError) *response.Response {
+	return errorToResponse(err)
 }
 
-func closeConn(conn net.Conn) {
-	err := conn.Close()
-	if err != nil {
-		panic(err)
+func (server *Server) handle(req *request.Request) *response.Response {
+	handler, routerError := server.router.GetRequestHandler(req.Uri(), req.Method())
+	if routerError != nil {
+		return server.handleError(routerError)
 	}
-}
-
-func closeListener(listener net.Listener) {
-	err := listener.Close()
-	if err != nil {
-		panic(err)
-	}
-}
-
-func (*Server) handleError(err error) *response.Response {
-	return response.NewEmptyResponse(mapErrorToStatusCode(err))
-}
-
-func (server *Server) handle(req *request.Request, err error) *response.Response {
-	if err != nil {
-		return server.handleError(err)
-	}
-
-	handler, err := server.router.GetRequestHandler(req.Uri(), req.Method())
-	if err != nil {
-		return server.handleError(err)
-	}
-
-	res, err := handler(req)
-	if err != nil {
-		return server.handleError(err)
+	res, handlerError := handler(req)
+	if handlerError != nil {
+		return server.handleError(pkgerrors.NewAppError(handlerError))
 	}
 
 	return res
 }
 
-// Handles an incoming client connection.
-// It reads and parses the request, processes it, writes the response,
+// processConnection Handles an incoming client connection.
+// It reads and parses the request, handles it, writes the response to the stream,
 // and then closes the connection.
 func (server *Server) processConnection(conn net.Conn) {
 	defer closeConn(conn)
 	reader := bufio.NewReader(conn)
 
-	req, err := server.reader.Parse(reader)
+	req, parseError := server.reader.Parse(reader)
 
-	res := server.handle(req, err)
+	var res *response.Response
+	if parseError != nil {
+		res = server.handleError(parseError)
+	} else {
+		res = server.handle(req)
+	}
 
 	buf := bytes.Buffer{}
 	server.serializer.Serialize(res, &buf)
 
-	_, err = conn.Write(buf.Bytes())
-	if err != nil {
-		fmt.Printf("Error writing to conn %s:%s\n", conn.RemoteAddr(), err.Error())
+	_, writeError := conn.Write(buf.Bytes())
+	if writeError != nil {
+		fmt.Printf("Error writing to conn %s:%s\n", conn.RemoteAddr(), writeError.Error())
 	}
 }
 
