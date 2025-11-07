@@ -18,7 +18,7 @@ import (
 const HTTPVersion = "HTTP/1.0"
 
 type Server struct {
-	router         *router.Router
+	router         router.IRouter
 	addr           *Address
 	reader         readers.IRequestReader
 	serializer     serializers.ISerializer[*response.Response]
