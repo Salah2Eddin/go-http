@@ -14,7 +14,6 @@ func (h HeadersSerializer) Serialize(headers *httpheaders.Headers, buf *bytes.Bu
 		h.headerSerializer.Serialize(header, buf)
 		buf.WriteString("\r\n")
 	}
-	buf.WriteString("\r\n")
 }
 
 type HeaderSerializer struct {
