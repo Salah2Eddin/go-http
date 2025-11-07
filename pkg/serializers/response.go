@@ -2,6 +2,7 @@ package serializers
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 
 	"github.com/Salah2Eddin/go-http/pkg/response"
@@ -29,7 +30,10 @@ func (r ResponseSerializer) Serialize(resp *response.Response, buf *bytes.Buffer
 	_, hasTransferEncoding := resp.Headers.Get("transfer-encoding")
 	_, hasLength := resp.Headers.Get("content-length")
 	if !hasTransferEncoding && !hasLength {
-		resp.Headers.AddFromString("content-length", strconv.Itoa(tmpBodyBuf.Len()))
+		err := resp.Headers.AddFromString("content-length", strconv.Itoa(tmpBodyBuf.Len()))
+		if err != nil {
+			panic(fmt.Sprintf("failed to add content-length header: %s", err))
+		}
 	}
 
 	r.statusSerializer.Serialize(resp.Line, buf)
