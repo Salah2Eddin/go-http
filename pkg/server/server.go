@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/Salah2Eddin/go-http/pkg/httpheaders"
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/readers"
 	"github.com/Salah2Eddin/go-http/pkg/request"
@@ -19,25 +18,11 @@ import (
 const HTTPVersion = "HTTP/1.0"
 
 type Server struct {
-	router     *router.Router
-	addr       *Address
-	reader     readers.IRequestReader
-	serializer serializers.ISerializer[*response.Response]
-}
-
-func errorToResponse(err *pkgerrors.AppError) *response.Response {
-	headers := httpheaders.New()
-	if err := headers.AddFromString("content-type", "application/json"); err != nil {
-		panic(fmt.Sprintf("Failed to set static header: %q", err))
-	}
-
-	buf := []byte(fmt.Sprintf(`{"error":%q}`, err.Error()))
-	resp := response.NewResponse(
-		response.NewStatusLine(HTTPVersion, err.HTTPStatusCode()),
-		headers,
-		buf,
-	)
-	return resp
+	router         *router.Router
+	addr           *Address
+	reader         readers.IRequestReader
+	serializer     serializers.ISerializer[*response.Response]
+	errorResponder IErrorResponder
 }
 
 func closeConn(conn net.Conn) {
@@ -62,10 +47,11 @@ func NewServer(address *Address) *Server {
 
 	// Initialize the server with address and router in one statement
 	return &Server{
-		addr:       address,
-		router:     router.NewRouter(),
-		serializer: serializers.NewResponseSerializer(),
-		reader:     readers.NewRequestReader(),
+		addr:           address,
+		router:         router.NewRouter(),
+		serializer:     serializers.NewResponseSerializer(),
+		reader:         readers.NewRequestReader(),
+		errorResponder: JSONErrorResponder{},
 	}
 }
 
@@ -75,8 +61,8 @@ func (server *Server) AddHandler(uriStr string, method string, handler router.Ha
 	return server.router.AddHandler(uri.NewUri(uriStr), method, handler)
 }
 
-func (*Server) handleError(err *pkgerrors.AppError) *response.Response {
-	return errorToResponse(err)
+func (server *Server) handleError(err *pkgerrors.AppError) *response.Response {
+	return server.errorResponder.From(err)
 }
 
 func (server *Server) handle(req *request.Request) *response.Response {
