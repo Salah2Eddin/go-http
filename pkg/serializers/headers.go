@@ -12,6 +12,7 @@ type HeadersSerializer struct {
 func (h HeadersSerializer) Serialize(headers *httpheaders.Headers, buf *bytes.Buffer) {
 	for _, header := range headers.Headers() {
 		h.headerSerializer.Serialize(header, buf)
+		buf.WriteString("\r\n")
 	}
 	buf.WriteString("\r\n")
 }
