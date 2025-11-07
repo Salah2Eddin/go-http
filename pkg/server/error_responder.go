@@ -15,7 +15,7 @@ type JSONErrorResponder struct {
 }
 
 func (J JSONErrorResponder) generateResponseLine(err *pkgerrors.AppError) *response.StatusLine {
-	return response.NewStatusLine(HTTPVersion, err.HTTPStatusCode())
+	return response.NewStatusLine(err.HTTPStatusCode())
 }
 
 func (J JSONErrorResponder) generateResponseHeaders() *httpheaders.Headers {

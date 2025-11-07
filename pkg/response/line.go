@@ -65,8 +65,9 @@ var statusTextMap = map[int]string{
 	510: "Not Extended",
 	511: "Network Authentication Required",
 }
+var version = "HTTP/1.1"
 
-func NewStatusLine(version string, code int) *StatusLine {
+func NewStatusLine(code int) *StatusLine {
 	return &StatusLine{
 		Version: version, Code: code, Phrase: statusText(code),
 	}

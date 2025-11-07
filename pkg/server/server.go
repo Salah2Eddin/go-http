@@ -11,8 +11,6 @@ import (
 	"strings"
 )
 
-const HTTPVersion = "HTTP/1.0"
-
 type Server struct {
 	router         router.IRouter
 	addr           *Address
