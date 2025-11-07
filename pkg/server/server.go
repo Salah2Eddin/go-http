@@ -21,8 +21,8 @@ const HTTPVersion = "HTTP/1.0"
 type Server struct {
 	router     *router.Router
 	addr       *Address
-	reader     readers.RequestReader
-	serializer serializers.ResponseSerializer
+	reader     readers.IRequestReader
+	serializer serializers.ISerializer[*response.Response]
 }
 
 func errorToResponse(err *pkgerrors.AppError) *response.Response {
