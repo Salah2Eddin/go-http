@@ -12,11 +12,13 @@ import (
 )
 
 type Server struct {
-	router         router.IRouter
-	addr           *Address
+	addr Address
+
+	// Components
 	reader         readers.IRequestReader
 	serializer     serializers.ISerializer[*response.Response]
 	errorResponder IErrorResponder
+	router         router.IRouter
 }
 
 func closeListener(listener net.Listener) {
@@ -26,20 +28,24 @@ func closeListener(listener net.Listener) {
 	}
 }
 
-// NewServer creates and initializes a new Server instance with the provided address or a default address if nil.
-func NewServer(address *Address) *Server {
-	if address == nil {
-		address = &Address{Port: "8576"} // Default address
-	}
-
-	// Initialize the server with address and router in one statement
-	return &Server{
-		addr:           address,
+// NewServer creates and initializes a new Server instance with the provided options.
+// If no options are provided, default values are used.
+func NewServer(opts ...Option) *Server {
+	// Initialize with defaults
+	server := &Server{
+		addr:           Address{Port: "8576"},
 		router:         router.NewRouter(),
 		serializer:     serializers.NewResponseSerializer(),
 		reader:         readers.NewRequestReader(),
 		errorResponder: JSONErrorResponder{},
 	}
+
+	// Apply all options
+	for _, o := range opts {
+		o(server)
+	}
+
+	return server
 }
 
 // AddHandler Registers a new handler for the given URI and HTTP method.

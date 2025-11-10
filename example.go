@@ -32,7 +32,7 @@ func index(request *request.Request) (*response.Response, error) {
 }
 
 func main() {
-	app := server.NewServer(&server.Address{IP: "127.0.0.1", Port: "8008"})
+	app := server.NewServer(server.WithPort("8008"))
 	err := app.AddHandler("/id/*", "GET", index)
 	if err != nil {
 		panic(err)
