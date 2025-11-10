@@ -45,6 +45,9 @@ func (router *Router) getRoute(uri *uri.Uri, allowWildcardInURI bool) (*Route, e
 	}
 	// at this point, a route with id is guaranteed to exist
 	route := router.routes[id]
+	if route == nil {
+		return nil, &pkgerrors.ErrRouteNotFound{Route: uri.String()}
+	}
 	return route, nil
 }
 
