@@ -1,13 +1,8 @@
 package server
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
-	"github.com/Salah2Eddin/go-http/pkg/httpheaders"
-	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/readers"
-	"github.com/Salah2Eddin/go-http/pkg/request"
 	"github.com/Salah2Eddin/go-http/pkg/response"
 	"github.com/Salah2Eddin/go-http/pkg/router"
 	"github.com/Salah2Eddin/go-http/pkg/serializers"
@@ -16,35 +11,14 @@ import (
 	"strings"
 )
 
-const HTTPVersion = "HTTP/1.0"
-
 type Server struct {
-	router     *router.Router
-	addr       *Address
-	reader     readers.RequestReader
-	serializer serializers.ResponseSerializer
-}
+	addr Address
 
-func errorToResponse(err *pkgerrors.AppError) *response.Response {
-	headers := httpheaders.New()
-	if err := headers.AddFromString("content-type", "application/json"); err != nil {
-		panic(fmt.Sprintf("Failed to set static header: %q", err))
-	}
-
-	buf := []byte(fmt.Sprintf(`{"error":%q}`, err.Error()))
-	resp := response.NewResponse(
-		response.NewStatusLine(HTTPVersion, err.HTTPStatusCode()),
-		headers,
-		buf,
-	)
-	return resp
-}
-
-func closeConn(conn net.Conn) {
-	err := conn.Close()
-	if err != nil {
-		fmt.Printf("Failed to close connection: %s\n", conn.RemoteAddr().String())
-	}
+	// Components
+	reader         readers.IRequestReader
+	serializer     serializers.ISerializer[*response.Response]
+	errorResponder IErrorResponder
+	router         router.IRouter
 }
 
 func closeListener(listener net.Listener) {
@@ -54,19 +28,24 @@ func closeListener(listener net.Listener) {
 	}
 }
 
-// NewServer creates and initializes a new Server instance with the provided address or a default address if nil.
-func NewServer(address *Address) *Server {
-	if address == nil {
-		address = &Address{Port: "8576"} // Default address
+// NewServer creates and initializes a new Server instance with the provided options.
+// If no options are provided, default values are used.
+func NewServer(opts ...Option) *Server {
+	// Initialize with defaults
+	server := &Server{
+		addr:           Address{Port: "8576"},
+		router:         router.NewRouter(),
+		serializer:     serializers.NewResponseSerializer(),
+		reader:         readers.NewRequestReader(),
+		errorResponder: JSONErrorResponder{},
 	}
 
-	// Initialize the server with address and router in one statement
-	return &Server{
-		addr:       address,
-		router:     router.NewRouter(),
-		serializer: serializers.NewResponseSerializer(),
-		reader:     readers.NewRequestReader(),
+	// Apply all options
+	for _, o := range opts {
+		o(server)
 	}
+
+	return server
 }
 
 // AddHandler Registers a new handler for the given URI and HTTP method.
@@ -75,45 +54,25 @@ func (server *Server) AddHandler(uriStr string, method string, handler router.Ha
 	return server.router.AddHandler(uri.NewUri(uriStr), method, handler)
 }
 
-func (*Server) handleError(err *pkgerrors.AppError) *response.Response {
-	return errorToResponse(err)
-}
+// acceptLoop continuously accepts incoming network connections and delegates handling to a new goroutine for each connection.
+func (server *Server) acceptLoop(listener net.Listener) {
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			fmt.Println("Error on connection:", err.Error())
+			continue
+		}
+		fmt.Printf("%s connected\n", conn.RemoteAddr())
 
-func (server *Server) handle(req *request.Request) *response.Response {
-	handler, routerError := server.router.GetRequestHandler(req.Uri(), req.Method())
-	if routerError != nil {
-		return server.handleError(routerError)
-	}
-	res, handlerError := handler(req)
-	if handlerError != nil {
-		return server.handleError(pkgerrors.NewAppError(handlerError))
-	}
-
-	return res
-}
-
-// processConnection Handles an incoming client connection.
-// It reads and parses the request, handles it, writes the response to the stream,
-// and then closes the connection.
-func (server *Server) processConnection(conn net.Conn) {
-	defer closeConn(conn)
-	reader := bufio.NewReader(conn)
-
-	req, parseError := server.reader.Parse(reader)
-
-	var res *response.Response
-	if parseError != nil {
-		res = server.handleError(parseError)
-	} else {
-		res = server.handle(req)
-	}
-
-	buf := bytes.Buffer{}
-	server.serializer.Serialize(res, &buf)
-
-	_, writeError := conn.Write(buf.Bytes())
-	if writeError != nil {
-		fmt.Printf("Error writing to conn %s:%s\n", conn.RemoteAddr(), writeError.Error())
+		go func() {
+			handler := ConnectionHandler{
+				conn:           conn,
+				reader:         server.reader,
+				serializer:     server.serializer,
+				errorResponder: server.errorResponder,
+				router:         server.router}
+			handler.Handle()
+		}()
 	}
 }
 
@@ -131,13 +90,6 @@ func (server *Server) Start() {
 	server.addr.IP, server.addr.Port, _ = strings.Cut(listener.Addr().String(), ":")
 	fmt.Printf("Listening on: %v\n", server.addr.String())
 
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			fmt.Println("Error on connection:", err.Error())
-			continue
-		}
-		fmt.Printf("%s connected\n", conn.RemoteAddr())
-		go server.processConnection(conn)
-	}
+	// Start acceptance loop
+	server.acceptLoop(listener)
 }
