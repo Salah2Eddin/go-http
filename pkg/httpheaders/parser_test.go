@@ -416,6 +416,18 @@ func TestSplitHeaderValues(t *testing.T) {
 			expectedCount: 2,
 			expectedError: false,
 		},
+		{
+			name:          "mix unquoted then quoted values",
+			input:         []byte(`value1, "value2"`),
+			expectedCount: 2,
+			expectedError: false,
+		},
+		{
+			name:          "mix quoted then unquoted values",
+			input:         []byte(`"value1", value2`),
+			expectedCount: 2,
+			expectedError: false,
+		},
 	}
 
 	for _, tc := range testCases {
