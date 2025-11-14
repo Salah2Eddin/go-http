@@ -31,13 +31,13 @@ func TestValidHeaderName(t *testing.T) {
 			input:    []byte("X-Custom!#$_"),
 			expected: true,
 		},
+
+		// Invalid - whitespace
 		{
 			name:     "empty name",
 			input:    []byte(""),
-			expected: true,
+			expected: false,
 		},
-
-		// Invalid - whitespace
 		{
 			name:     "space in middle",
 			input:    []byte("Content Type"),
