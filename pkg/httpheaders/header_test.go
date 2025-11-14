@@ -15,7 +15,7 @@ func TestNewHeader(t *testing.T) {
 		t.Errorf("expected name 'Content-Type', got '%s'", header.Name())
 	}
 	if len(header.Values()) != 0 {
-		t.Error("expected empty values slice")
+		t.Errorf("expected no values, got %d", len(header.Values()))
 	}
 }
 
@@ -49,8 +49,8 @@ func TestNewHeaderFromStringSimple(t *testing.T) {
 	if header.Name() != "Content-Type" {
 		t.Errorf("expected name 'Content-Type', got '%s'", header.Name())
 	}
-	if len(header.Values()) == 0 {
-		t.Error("expected at least one value")
+	if len(header.Values()) != 1 {
+		t.Errorf("expected one value, got %d", len(header.Values()))
 	}
 }
 
@@ -63,8 +63,8 @@ func TestNewHeaderFromStringWithParameters(t *testing.T) {
 	if header == nil {
 		t.Fatal("NewHeaderFromString() returned nil header")
 	}
-	if len(header.Values()) == 0 {
-		t.Error("expected at least one value with parameters")
+	if len(header.Values()) != 1 {
+		t.Error("expected one value with parameters")
 	}
 }
 
@@ -77,8 +77,8 @@ func TestNewHeaderFromStringMultipleValues(t *testing.T) {
 	if header == nil {
 		t.Fatal("NewHeaderFromString() returned nil header")
 	}
-	if len(header.Values()) < 3 {
-		t.Errorf("expected at least 3 values, got %d", len(header.Values()))
+	if len(header.Values()) != 3 {
+		t.Errorf("expected exactly 3 values, got %d", len(header.Values()))
 	}
 }
 
@@ -91,8 +91,8 @@ func TestNewHeaderFromStringMultipleValuesWithParameters(t *testing.T) {
 	if header == nil {
 		t.Fatal("NewHeaderFromString() returned nil header")
 	}
-	if len(header.Values()) < 3 {
-		t.Errorf("expected at least 3 values, got %d", len(header.Values()))
+	if len(header.Values()) != 3 {
+		t.Errorf("expected exactly 3 values, got %d", len(header.Values()))
 	}
 }
 
@@ -221,8 +221,8 @@ func TestHeaderFromStringComplexContentType(t *testing.T) {
 	if header == nil {
 		t.Fatal("expected non-nil header")
 	}
-	if len(header.Values()) == 0 {
-		t.Error("expected at least one value")
+	if len(header.Values()) != 1 {
+		t.Errorf("expected exactly 1 value, got %d", len(header.Values()))
 	}
 }
 
@@ -236,7 +236,7 @@ func TestHeaderFromStringComplexAccept(t *testing.T) {
 		t.Fatal("expected non-nil header")
 	}
 	if len(header.Values()) != 4 {
-		t.Errorf("expected at least %d values, got %d", 4, len(header.Values()))
+		t.Errorf("expected exactly 4 values, got %d", len(header.Values()))
 	}
 }
 

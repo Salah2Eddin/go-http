@@ -9,8 +9,8 @@ func TestNewHeaderValues(t *testing.T) {
 	if values == nil {
 		t.Fatal("NewHeaderValues() returned nil")
 	}
-	if len(values) == 0 {
-		t.Error("expected at least one value")
+	if len(values) != 1 {
+		t.Errorf("expected exactly 1 value, got %d", len(values))
 	}
 }
 
@@ -19,8 +19,8 @@ func TestNewHeaderValuesMultiple(t *testing.T) {
 	if values == nil {
 		t.Fatal("NewHeaderValues() returned nil")
 	}
-	if len(values) < 3 {
-		t.Errorf("expected at least 3 values, got %d", len(values))
+	if len(values) != 3 {
+		t.Errorf("expected 3 values, got %d", len(values))
 	}
 }
 
@@ -29,8 +29,8 @@ func TestNewHeaderValuesWithParameters(t *testing.T) {
 	if values == nil {
 		t.Fatal("NewHeaderValues() returned nil")
 	}
-	if len(values) == 0 {
-		t.Error("expected at least one value")
+	if len(values) != 1 {
+		t.Errorf("expected exactly 1 value, got %d", len(values))
 	}
 }
 
@@ -134,8 +134,8 @@ func TestParams(t *testing.T) {
 	}
 
 	params := value.Params()
-	if len(params) < 2 {
-		t.Errorf("expected at least 2 params, got %d", len(params))
+	if len(params) != 2 {
+		t.Errorf("expected 2 params, got %d", len(params))
 	}
 }
 

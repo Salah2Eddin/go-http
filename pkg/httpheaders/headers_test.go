@@ -34,8 +34,8 @@ func TestAddFromStringSimple(t *testing.T) {
 	}
 
 	values := retrieved.Values()
-	if len(values) == 0 {
-		t.Error("expected at least one value")
+	if len(values) != 1 {
+		t.Errorf("expected exactly 1 value, got %d", len(values))
 	}
 }
 
@@ -53,8 +53,8 @@ func TestAddFromStringWithParameters(t *testing.T) {
 	}
 
 	values := retrieved.Values()
-	if len(values) == 0 {
-		t.Error("expected at least one value with parameters")
+	if len(values) != 1 {
+		t.Errorf("expected exactly 1 value with parameters, got %d", len(values))
 	}
 }
 
@@ -72,8 +72,8 @@ func TestAddFromStringMultipleValues(t *testing.T) {
 	}
 
 	values := retrieved.Values()
-	if len(values) < 3 {
-		t.Errorf("expected at least 3 values, got %d", len(values))
+	if len(values) != 3 {
+		t.Errorf("expected exactly 3 values, got %d", len(values))
 	}
 }
 
@@ -91,8 +91,8 @@ func TestAddFromStringMultipleValuesWithParameters(t *testing.T) {
 	}
 
 	values := retrieved.Values()
-	if len(values) < 2 {
-		t.Errorf("expected at least 2 values, got %d", len(values))
+	if len(values) != 2 {
+		t.Errorf("expected exactly 2 values, got %d", len(values))
 	}
 }
 
@@ -143,7 +143,7 @@ func TestAddFromHeaderMergesValues(t *testing.T) {
 
 	values := retrieved.Values()
 	if len(values) != 2 {
-		t.Errorf("expected at least %d values after merge, got %d", 2, len(values))
+		t.Errorf("expected exactly 2 values after merge, got %d", len(values))
 	}
 }
 
@@ -163,7 +163,7 @@ func TestAddFromHeaderMergesMultipleValues(t *testing.T) {
 
 	values := retrieved.Values()
 	if len(values) != 4 {
-		t.Errorf("expected at least %d total values after merge, got %d", 4, len(values))
+		t.Errorf("expected exactly 4 total values after merge, got %d", len(values))
 	}
 }
 
@@ -183,7 +183,7 @@ func TestAddFromHeaderMergesValuesWithParameters(t *testing.T) {
 
 	values := retrieved.Values()
 	if len(values) != 2 {
-		t.Errorf("expected at least %d values, got %d", 2, len(values))
+		t.Errorf("expected exactly 2 values, got %d", len(values))
 	}
 }
 
@@ -301,8 +301,8 @@ func TestAddFromStringComplexScenario(t *testing.T) {
 	}
 
 	values := retrieved.Values()
-	if len(values) < 4 {
-		t.Errorf("expected at least 4 values in complex Accept header, got %d", len(values))
+	if len(values) != 4 {
+		t.Errorf("expected exactly 4 values in complex Accept header, got %d", len(values))
 	}
 }
 
@@ -344,8 +344,8 @@ func TestAddFromStringContentTypeVariants(t *testing.T) {
 			}
 
 			values := retrieved.Values()
-			if len(values) == 0 {
-				t.Error("expected at least one value")
+			if len(values) != 1 {
+				t.Errorf("expected exactly 1 value, got %d", len(values))
 			}
 		})
 	}
