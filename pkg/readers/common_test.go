@@ -243,7 +243,7 @@ func TestReadLineNoData(t *testing.T) {
 	err := readLine(reader, &buf)
 
 	if err == nil {
-		t.Error("readLine() expected error, got nil")
+		t.Error("readLine() returned nil error, expected non-nil error (io.EOF)")
 	}
 	if err != io.EOF {
 		t.Errorf("readLine() error = %v, expected io.EOF", err)
@@ -258,7 +258,7 @@ func TestReadLineOnlyCR(t *testing.T) {
 	err := readLine(reader, &buf)
 
 	if err == nil {
-		t.Error("readLine() expected error, got nil")
+		t.Error("readLine() returned nil error, expected non-nil error (io.EOF)")
 	}
 	if err != io.EOF {
 		t.Errorf("readLine() error = %v, expected io.EOF", err)
@@ -273,7 +273,7 @@ func TestReadLineOnlyLF(t *testing.T) {
 	err := readLine(reader, &buf)
 
 	if err == nil {
-		t.Error("readLine() expected error, got nil")
+		t.Error("readLine() returned nil error, expected non-nil error (io.EOF)")
 	}
 	if err != io.EOF {
 		t.Errorf("readLine() error = %v, expected io.EOF", err)

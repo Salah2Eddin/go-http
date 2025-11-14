@@ -9,7 +9,7 @@ func TestNewHeader(t *testing.T) {
 	header := NewHeader("Content-Type", values)
 
 	if header == nil {
-		t.Fatal("NewHeader() returned nil")
+		t.Fatal("NewHeader() returned nil, expected non-nil header")
 	}
 	if header.Name() != "Content-Type" {
 		t.Errorf("expected name 'Content-Type', got '%s'", header.Name())
@@ -27,7 +27,7 @@ func TestNewHeaderWithValues(t *testing.T) {
 	header := NewHeader("Accept", values)
 
 	if header == nil {
-		t.Fatal("NewHeader() returned nil")
+		t.Fatal("NewHeader() returned nil, expected non-nil header")
 	}
 	if header.Name() != "Accept" {
 		t.Errorf("expected name 'Accept', got '%s'", header.Name())
@@ -44,7 +44,7 @@ func TestNewHeaderFromStringSimple(t *testing.T) {
 		t.Errorf("NewHeaderFromString() error = %v", err)
 	}
 	if header == nil {
-		t.Fatal("NewHeaderFromString() returned nil header")
+		t.Fatal("NewHeaderFromString() returned nil header, expected non-nil header")
 	}
 	if header.Name() != "Content-Type" {
 		t.Errorf("expected name 'Content-Type', got '%s'", header.Name())
@@ -61,10 +61,10 @@ func TestNewHeaderFromStringWithParameters(t *testing.T) {
 		t.Errorf("NewHeaderFromString() with parameters error = %v", err)
 	}
 	if header == nil {
-		t.Fatal("NewHeaderFromString() returned nil header")
+		t.Fatal("NewHeaderFromString() returned nil header, expected non-nil header")
 	}
 	if len(header.Values()) != 1 {
-		t.Error("expected one value with parameters")
+		t.Errorf("expected exactly 1 value with parameters, got %d", len(header.Values()))
 	}
 }
 
@@ -75,7 +75,7 @@ func TestNewHeaderFromStringMultipleValues(t *testing.T) {
 		t.Errorf("NewHeaderFromString() with multiple values error = %v", err)
 	}
 	if header == nil {
-		t.Fatal("NewHeaderFromString() returned nil header")
+		t.Fatal("NewHeaderFromString() returned nil header, expected non-nil header")
 	}
 	if len(header.Values()) != 3 {
 		t.Errorf("expected exactly 3 values, got %d", len(header.Values()))
@@ -89,7 +89,7 @@ func TestNewHeaderFromStringMultipleValuesWithParameters(t *testing.T) {
 		t.Errorf("NewHeaderFromString() with multiple values and parameters error = %v", err)
 	}
 	if header == nil {
-		t.Fatal("NewHeaderFromString() returned nil header")
+		t.Fatal("NewHeaderFromString() returned nil header, expected non-nil header")
 	}
 	if len(header.Values()) != 3 {
 		t.Errorf("expected exactly 3 values, got %d", len(header.Values()))
@@ -103,7 +103,7 @@ func TestNewHeaderFromStringEmptyValue(t *testing.T) {
 		t.Errorf("NewHeaderFromString() with empty value error = %v", err)
 	}
 	if header != nil {
-		t.Fatal("NewHeaderFromString() returned nil header")
+		t.Fatalf("NewHeaderFromString() returned non-nil header %v, expected nil for empty value", header)
 	}
 }
 
@@ -219,7 +219,7 @@ func TestHeaderFromStringComplexContentType(t *testing.T) {
 		t.Errorf("NewHeaderFromString() error = %v", err)
 	}
 	if header == nil {
-		t.Fatal("expected non-nil header")
+		t.Fatal("NewHeaderFromString() returned nil header, expected non-nil header")
 	}
 	if len(header.Values()) != 1 {
 		t.Errorf("expected exactly 1 value, got %d", len(header.Values()))
@@ -233,7 +233,7 @@ func TestHeaderFromStringComplexAccept(t *testing.T) {
 		t.Errorf("NewHeaderFromString() error = %v", err)
 	}
 	if header == nil {
-		t.Fatal("expected non-nil header")
+		t.Fatal("NewHeaderFromString() returned nil header, expected non-nil header")
 	}
 	if len(header.Values()) != 4 {
 		t.Errorf("expected exactly 4 values, got %d", len(header.Values()))

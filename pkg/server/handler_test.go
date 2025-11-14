@@ -2,10 +2,11 @@ package server
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/Salah2Eddin/go-http/pkg/httpheaders"
 	"github.com/Salah2Eddin/go-http/pkg/reqline"
 	"github.com/Salah2Eddin/go-http/pkg/uri"
-	"testing"
 
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/request"
@@ -34,11 +35,11 @@ func TestHandleError(t *testing.T) {
 	result := handler.handleError(appErr)
 
 	if result != expectedResponse {
-		t.Error("expected handleError to return response from errorResponder")
+		t.Errorf("handleError() returned %v, expected response %v from errorResponder", result, expectedResponse)
 	}
 
 	if !errors.Is(appErr, mockResp.lastErr) {
-		t.Error("expected errorResponder to receive the error")
+		t.Errorf("errorResponder received error %v, expected it to wrap %v", mockResp.lastErr, appErr)
 	}
 }
 
@@ -58,7 +59,7 @@ func TestHandleSuccess(t *testing.T) {
 	result := handler.handle(req)
 
 	if result != expectedResponse {
-		t.Error("expected handle to return response from handler")
+		t.Errorf("handle() returned %v, expected response %v from handler", result, expectedResponse)
 	}
 
 	if mockRtr.lastMethod != "GET" {
@@ -82,11 +83,11 @@ func TestHandleRouterError(t *testing.T) {
 	result := handler.handle(req)
 
 	if result != expectedResponse {
-		t.Error("expected handle to return error response on router error")
+		t.Errorf("handle() returned %v, expected error response %v on router error", result, expectedResponse)
 	}
 
 	if !errors.Is(routerErr, mockResp.lastErr) {
-		t.Error("expected errorResponder to receive router error")
+		t.Errorf("errorResponder received error %v, expected it to wrap router error %v", mockResp.lastErr, routerErr)
 	}
 }
 
@@ -108,7 +109,7 @@ func TestHandleHandlerError(t *testing.T) {
 	result := handler.handle(req)
 
 	if result != expectedResponse {
-		t.Error("expected handle to return error response on handler error")
+		t.Errorf("handle() returned %v, expected error response %v on handler error", result, expectedResponse)
 	}
 }
 
@@ -119,7 +120,7 @@ func TestCloseConn(t *testing.T) {
 	handler.closeConn()
 
 	if !conn.closed {
-		t.Error("expected connection to be closed")
+		t.Error("conn.closed is false, expected connection to be closed after closeConn()")
 	}
 }
 
@@ -133,7 +134,7 @@ func TestCloseConnWithError(t *testing.T) {
 	handler.closeConn()
 
 	if !conn.closed {
-		t.Error("expected connection close to be attempted")
+		t.Error("conn.closed is false, expected connection close to be attempted even with close error")
 	}
 }
 
@@ -239,7 +240,7 @@ func TestHandleWritesToConnection(t *testing.T) {
 	handler.Handle()
 
 	if conn.writeData.Len() == 0 {
-		t.Error("expected data to be written to connection")
+		t.Error("conn.writeData.Len() is 0, expected data to be written to connection")
 	}
 }
 
@@ -265,6 +266,6 @@ func TestHandleWriteError(t *testing.T) {
 	handler.Handle()
 
 	if !conn.closed {
-		t.Error("expected connection to be closed despite write error")
+		t.Error("conn.closed is false, expected connection to be closed despite write error")
 	}
 }

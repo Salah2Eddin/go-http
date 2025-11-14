@@ -78,7 +78,7 @@ func TestParseRequestLine(t *testing.T) {
 	}
 
 	if result == nil {
-		t.Fatal("expected non-nil result")
+		t.Fatal("ParseRequestLine() returned nil result, expected non-nil request line")
 	}
 }
 
@@ -101,7 +101,7 @@ func TestParseRequestLineWithWhitespace(t *testing.T) {
 			}
 
 			if result == nil {
-				t.Error("expected non-nil result")
+				t.Error("ParseRequestLine() returned nil result, expected non-nil request line")
 			}
 		})
 	}
@@ -126,7 +126,7 @@ func TestParseRequestLineNonASCII(t *testing.T) {
 			}
 
 			if result != nil {
-				t.Error("expected nil result on error")
+				t.Error("ParseRequestLine() returned non-nil result on error, expected nil")
 			}
 
 			var errInvalidRequestLine pkgerrors.ErrInvalidRequestLine
@@ -157,7 +157,7 @@ func TestParseRequestLineInvalidFormat(t *testing.T) {
 			}
 
 			if result != nil {
-				t.Error("expected nil result on error")
+				t.Error("ParseRequestLine() returned non-nil result on error, expected nil")
 			}
 
 			var errInvalidRequestLine pkgerrors.ErrInvalidRequestLine
@@ -187,7 +187,7 @@ func TestParseRequestLineInvalidHTTPVersion(t *testing.T) {
 			}
 
 			if result != nil {
-				t.Error("expected nil result on error")
+				t.Error("ParseRequestLine() returned non-nil result on error, expected nil")
 			}
 
 			var errInvalidRequestLine pkgerrors.ErrInvalidRequestLine
@@ -219,7 +219,7 @@ func TestParseRequestLineDifferentMethods(t *testing.T) {
 			}
 
 			if result == nil {
-				t.Error("expected non-nil result")
+				t.Error("ParseRequestLine() returned nil result, expected non-nil request line")
 			}
 		})
 	}
@@ -245,7 +245,7 @@ func TestParseRequestLineDifferentHTTPVersions(t *testing.T) {
 			}
 
 			if result == nil {
-				t.Error("expected non-nil result")
+				t.Error("ParseRequestLine() returned nil result, expected non-nil request line")
 			}
 		})
 	}

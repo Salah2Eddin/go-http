@@ -31,7 +31,7 @@ func TestRequestLineReaderReadError(t *testing.T) {
 	result, err := r.Read(reader)
 
 	if err == nil {
-		t.Error("Read() expected error, got nil")
+		t.Error("Read() returned nil error for empty input, expected non-nil error")
 	}
 	if err != io.EOF {
 		t.Errorf("Read() error = %v, expected io.EOF", err)

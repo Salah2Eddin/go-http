@@ -31,7 +31,7 @@ func TestHeaderReaderReadError(t *testing.T) {
 	result, err := h.Read(reader)
 
 	if err == nil {
-		t.Error("Read() expected error, got nil")
+		t.Error("Read() returned nil error for empty input, expected non-nil error (io.EOF)")
 	}
 	if err != io.EOF {
 		t.Errorf("Read() error = %v, expected io.EOF", err)

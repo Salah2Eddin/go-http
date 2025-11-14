@@ -32,7 +32,7 @@ func TestEmptyBodyReaderWithBufferedData(t *testing.T) {
 	result, err := e.Read(reader)
 
 	if err == nil {
-		t.Error("Read() expected error, got nil")
+		t.Error("Read() returned nil error for non-empty buffer, expected non-nil error (ErrExpectedEmptyBody)")
 	}
 	var errExpectedEmptyBody pkgerrors.ErrExpectedEmptyBody
 	if !errors.As(err, &errExpectedEmptyBody) {
@@ -50,7 +50,7 @@ func TestEmptyBodyReaderWithSingleByte(t *testing.T) {
 	result, err := e.Read(reader)
 
 	if err == nil {
-		t.Error("Read() expected error, got nil")
+		t.Error("Read() returned nil error for non-empty buffer, expected non-nil error (ErrExpectedEmptyBody)")
 	}
 	var errExpectedEmptyBody pkgerrors.ErrExpectedEmptyBody
 	if !errors.As(err, &errExpectedEmptyBody) {
@@ -68,10 +68,10 @@ func TestEmptyBodyReaderReturnsEmptySlice(t *testing.T) {
 	result, err := e.Read(reader)
 
 	if err != nil {
-		t.Errorf("Read() error = %v", err)
+		t.Errorf("Read() returned unexpected error: %v, expected nil", err)
 	}
 	if result == nil {
-		t.Error("Read() returned nil, expected empty slice")
+		t.Error("Read() returned nil slice, expected empty slice ([]byte{})")
 	}
 	if len(result) != 0 {
 		t.Errorf("Read() length = %d, expected 0", len(result))
@@ -123,7 +123,7 @@ func TestLengthBodyReaderReadInsufficientData(t *testing.T) {
 	result, err := lr.Read(reader)
 
 	if err == nil {
-		t.Error("Read() expected error, got nil")
+		t.Error("Read() returned nil error for insufficient data, expected non-nil error (ErrIncorrectContentLength)")
 	}
 	var errIncorrectContentLength pkgerrors.ErrIncorrectContentLength
 	if !errors.As(err, &errIncorrectContentLength) {

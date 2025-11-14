@@ -7,7 +7,7 @@ import (
 func TestNewHeaderValues(t *testing.T) {
 	values := NewHeaderValues("application/json")
 	if values == nil {
-		t.Fatal("NewHeaderValues() returned nil")
+		t.Fatal("NewHeaderValues() returned nil, expected non-nil slice")
 	}
 	if len(values) != 1 {
 		t.Errorf("expected exactly 1 value, got %d", len(values))
@@ -17,7 +17,7 @@ func TestNewHeaderValues(t *testing.T) {
 func TestNewHeaderValuesMultiple(t *testing.T) {
 	values := NewHeaderValues("application/json, text/html, text/plain")
 	if values == nil {
-		t.Fatal("NewHeaderValues() returned nil")
+		t.Fatal("NewHeaderValues() returned nil, expected non-nil slice")
 	}
 	if len(values) != 3 {
 		t.Errorf("expected 3 values, got %d", len(values))
@@ -27,7 +27,7 @@ func TestNewHeaderValuesMultiple(t *testing.T) {
 func TestNewHeaderValuesWithParameters(t *testing.T) {
 	values := NewHeaderValues("text/html; charset=utf-8")
 	if values == nil {
-		t.Fatal("NewHeaderValues() returned nil")
+		t.Fatal("NewHeaderValues() returned nil, expected non-nil slice")
 	}
 	if len(values) != 1 {
 		t.Errorf("expected exactly 1 value, got %d", len(values))
@@ -44,7 +44,7 @@ func TestNewHeaderValuesEmpty(t *testing.T) {
 func TestNewHeaderValueFromBytes(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("application/json"), []byte(""))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 	if value.Value() != "application/json" {
 		t.Errorf("expected 'application/json', got '%s'", value.Value())
@@ -54,7 +54,7 @@ func TestNewHeaderValueFromBytes(t *testing.T) {
 func TestNewHeaderValueFromBytesWithOneParam(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("text/html"), []byte("charset=utf-8"))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 	if value.Value() != "text/html" {
 		t.Errorf("expected 'text/html', got '%s'", value.Value())
@@ -62,7 +62,7 @@ func TestNewHeaderValueFromBytesWithOneParam(t *testing.T) {
 
 	charSet, exists := value.GetParam("charset")
 	if !exists {
-		t.Error("expected 'charset' parameter to exist")
+		t.Error("GetParam('charset') returned exists=false, expected parameter to exist")
 	}
 	if charSet != "utf-8" {
 		t.Errorf("expected 'utf-8', got '%s'", charSet)
@@ -72,12 +72,12 @@ func TestNewHeaderValueFromBytesWithOneParam(t *testing.T) {
 func TestNewHeaderValueFromBytesWithMultipleParams(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("multipart/form-data"), []byte("boundary=----WebKit;charset=utf-8"))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	boundary, exists := value.GetParam("boundary")
 	if !exists {
-		t.Error("expected 'boundary' parameter to exist")
+		t.Error("GetParam('boundary') returned exists=false, expected parameter to exist")
 	}
 	if boundary != "----WebKit" {
 		t.Errorf("expected '----WebKit', got '%s'", boundary)
@@ -85,7 +85,7 @@ func TestNewHeaderValueFromBytesWithMultipleParams(t *testing.T) {
 
 	charSet, exists := value.GetParam("charset")
 	if !exists {
-		t.Error("expected 'charset' parameter to exist")
+		t.Error("GetParam('charset') returned exists=false, expected parameter to exist")
 	}
 	if charSet != "utf-8" {
 		t.Errorf("expected 'utf-8', got '%s'", charSet)
@@ -95,7 +95,7 @@ func TestNewHeaderValueFromBytesWithMultipleParams(t *testing.T) {
 func TestNewHeaderValueFromBytesNoParams(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("application/json"), []byte(""))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	params := value.Params()
@@ -107,7 +107,7 @@ func TestNewHeaderValueFromBytesNoParams(t *testing.T) {
 func TestNewHeaderValueFromBytesInvalidParams(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("text/plain"), []byte("invalid;malformed"))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	params := value.Params()
@@ -119,7 +119,7 @@ func TestNewHeaderValueFromBytesInvalidParams(t *testing.T) {
 func TestValue(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("application/json"), []byte(""))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	if value.Value() != "application/json" {
@@ -130,7 +130,7 @@ func TestValue(t *testing.T) {
 func TestParams(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("text/html"), []byte("charset=utf-8;format=flowed"))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	params := value.Params()
@@ -142,7 +142,7 @@ func TestParams(t *testing.T) {
 func TestParamsEmpty(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("application/json"), []byte(""))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	params := value.Params()
@@ -154,14 +154,14 @@ func TestParamsEmpty(t *testing.T) {
 func TestSetParam(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("text/plain"), []byte(""))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	value.SetParam("charset", "iso-8859-1")
 
 	retrieved, exists := value.GetParam("charset")
 	if !exists {
-		t.Error("expected 'charset' parameter to exist after SetParam")
+		t.Error("GetParam('charset') returned exists=false after SetParam, expected parameter to exist")
 	}
 	if retrieved != "iso-8859-1" {
 		t.Errorf("expected 'iso-8859-1', got '%s'", retrieved)
@@ -171,14 +171,14 @@ func TestSetParam(t *testing.T) {
 func TestSetParamOverwrite(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("text/html"), []byte("charset=utf-8"))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	value.SetParam("charset", "iso-8859-1")
 
 	retrieved, exists := value.GetParam("charset")
 	if !exists {
-		t.Error("expected 'charset' parameter to exist")
+		t.Error("GetParam('charset') returned exists=false, expected parameter to exist")
 	}
 	if retrieved != "iso-8859-1" {
 		t.Errorf("expected 'iso-8859-1', got '%s'", retrieved)
@@ -188,7 +188,7 @@ func TestSetParamOverwrite(t *testing.T) {
 func TestSetParamMultiple(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("multipart/form-data"), []byte(""))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	value.SetParam("boundary", "----WebKit")
@@ -203,12 +203,12 @@ func TestSetParamMultiple(t *testing.T) {
 func TestGetParam(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("text/html"), []byte("charset=utf-8"))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	retrieved, exists := value.GetParam("charset")
 	if !exists {
-		t.Error("expected 'charset' parameter to exist")
+		t.Error("GetParam('charset') returned exists=false, expected parameter to exist")
 	}
 	if retrieved != "utf-8" {
 		t.Errorf("expected 'utf-8', got '%s'", retrieved)
@@ -218,57 +218,57 @@ func TestGetParam(t *testing.T) {
 func TestGetParamNotFound(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("text/html"), []byte("charset=utf-8"))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	_, exists := value.GetParam("format")
 	if exists {
-		t.Error("expected 'format' parameter to not exist")
+		t.Error("GetParam('format') returned exists=true, expected parameter to not exist")
 	}
 }
 
 func TestGetParamEmpty(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("application/json"), []byte(""))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	_, exists := value.GetParam("charset")
 	if exists {
-		t.Error("expected parameter to not exist in empty params")
+		t.Error("GetParam('charset') returned exists=true for empty params, expected parameter to not exist")
 	}
 }
 
 func TestDeleteParam(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("text/html"), []byte("charset=utf-8"))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	value.DeleteParam("charset")
 
 	_, exists := value.GetParam("charset")
 	if exists {
-		t.Error("expected 'charset' parameter to be deleted")
+		t.Error("GetParam('charset') returned exists=true after DeleteParam, expected parameter to be deleted")
 	}
 }
 
 func TestDeleteParamMultiple(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("text/html"), []byte("charset=utf-8;format=flowed"))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	value.DeleteParam("charset")
 
 	_, exists := value.GetParam("charset")
 	if exists {
-		t.Error("expected 'charset' parameter to be deleted")
+		t.Error("GetParam('charset') returned exists=true after DeleteParam, expected parameter to be deleted")
 	}
 
 	format, exists := value.GetParam("format")
 	if !exists {
-		t.Error("expected 'format' parameter to still exist")
+		t.Error("GetParam('format') returned exists=false, expected parameter to still exist after deleting 'charset'")
 	}
 	if format != "flowed" {
 		t.Errorf("expected 'flowed', got '%s'", format)
@@ -278,7 +278,7 @@ func TestDeleteParamMultiple(t *testing.T) {
 func TestDeleteParamNotExists(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("application/json"), []byte(""))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	value.DeleteParam("charset")
@@ -292,7 +292,7 @@ func TestDeleteParamNotExists(t *testing.T) {
 func TestComplexParamOperations(t *testing.T) {
 	value := NewHeaderValueFromBytes([]byte("text/html"), []byte("charset=utf-8;format=flowed"))
 	if value == nil {
-		t.Fatal("NewHeaderValueFromBytes() returned nil")
+		t.Fatal("NewHeaderValueFromBytes() returned nil, expected non-nil value")
 	}
 
 	value.SetParam("level", "1")
@@ -306,7 +306,7 @@ func TestComplexParamOperations(t *testing.T) {
 
 	_, formatExists := value.GetParam("format")
 	if formatExists {
-		t.Error("expected 'format' to be deleted")
+		t.Error("GetParam('format') returned exists=true after DeleteParam, expected parameter to be deleted")
 	}
 
 	level, _ := value.GetParam("level")

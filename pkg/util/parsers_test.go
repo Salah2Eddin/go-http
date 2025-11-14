@@ -28,10 +28,10 @@ func TestPeek(t *testing.T) {
 
 			if tc.expectError {
 				if err == nil {
-					t.Errorf("Peek() expected error, got nil")
+					t.Errorf("Peek() returned nil error, expected non-nil error (io.EOF)")
 				}
 				if err != io.EOF {
-					t.Errorf("Peek() expected io.EOF, got %v", err)
+					t.Errorf("Peek() returned error %v, expected io.EOF", err)
 				}
 			} else {
 				if err != nil {
@@ -148,10 +148,10 @@ func TestPeekEmptyReader(t *testing.T) {
 	result, err := Peek(reader)
 
 	if err == nil {
-		t.Error("Peek() on empty reader expected error, got nil")
+		t.Error("Peek() on empty reader returned nil error, expected non-nil error (io.EOF)")
 	}
 	if err != io.EOF {
-		t.Errorf("Peek() expected io.EOF, got %v", err)
+		t.Errorf("Peek() returned error %v, expected io.EOF", err)
 	}
 	if result != 0 {
 		t.Errorf("Peek() on empty reader = %q, want 0", result)
@@ -170,10 +170,10 @@ func TestPeekAtEnd(t *testing.T) {
 	// Peek should now return EOF
 	result, err := Peek(reader)
 	if err == nil {
-		t.Error("Peek() at end expected error, got nil")
+		t.Error("Peek() at end of reader returned nil error, expected non-nil error (io.EOF)")
 	}
 	if err != io.EOF {
-		t.Errorf("Peek() expected io.EOF, got %v", err)
+		t.Errorf("Peek() returned error %v, expected io.EOF", err)
 	}
 	if result != 0 {
 		t.Errorf("Peek() at end = %q, want 0", result)

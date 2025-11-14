@@ -29,12 +29,12 @@ func TestNewTreeNode(t *testing.T) {
 
 	node1 := tree.newTreeNode()
 	if node1 == nil {
-		t.Fatal("expected non-nil node")
+		t.Fatal("newTreeNode() returned nil, expected non-nil node")
 	}
 
 	node2 := tree.newTreeNode()
 	if node2 == nil {
-		t.Fatal("expected non-nil node")
+		t.Fatal("newTreeNode() returned nil, expected non-nil node")
 	}
 
 	if node1.id == node2.id {
@@ -62,7 +62,7 @@ func TestGetOrCreateTreeNodeNew(t *testing.T) {
 			}
 
 			if node == nil {
-				t.Fatal("expected non-nil node")
+				t.Fatal("getOrCreateTreeNode() returned nil, expected non-nil node")
 			}
 		})
 	}

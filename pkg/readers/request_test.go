@@ -21,7 +21,7 @@ func TestBodyReaderFactoryWithContentLength(t *testing.T) {
 		t.Errorf("bodyReaderFactory() error = %v, expected nil", err)
 	}
 	if bodyReader == nil {
-		t.Error("bodyReaderFactory() returned nil reader")
+		t.Error("bodyReaderFactory() returned nil reader, expected non-nil EmptyBodyReader")
 	}
 	_, ok := bodyReader.(lengthBodyReader)
 	if !ok {
@@ -37,7 +37,7 @@ func TestBodyReaderFactoryWithTransferEncoding(t *testing.T) {
 	bodyReader, err := r.bodyReaderFactory(headers)
 
 	if err == nil {
-		t.Error("bodyReaderFactory() expected error, got nil")
+		t.Error("bodyReaderFactory() returned nil error for unsupported transfer encoding, expected non-nil error")
 	}
 	_, ok := err.(pkgerrors.ErrUnsupportedBodyTransferEncoding)
 	if !ok {
@@ -58,7 +58,7 @@ func TestBodyReaderFactoryWithoutContentLengthOrTransferEncoding(t *testing.T) {
 		t.Errorf("bodyReaderFactory() error = %v, expected nil", err)
 	}
 	if bodyReader == nil {
-		t.Error("bodyReaderFactory() returned nil reader")
+		t.Error("bodyReaderFactory() returned nil reader, expected non-nil EmptyBodyReader")
 	}
 	_, ok := bodyReader.(EmptyBodyReader)
 	if !ok {
@@ -74,7 +74,7 @@ func TestBodyReaderFactoryInvalidContentLength(t *testing.T) {
 	bodyReader, err := r.bodyReaderFactory(headers)
 
 	if err == nil {
-		t.Error("bodyReaderFactory() expected error, got nil")
+		t.Error("bodyReaderFactory() returned nil error for unsupported transfer encoding, expected non-nil error")
 	}
 	_, ok := err.(pkgerrors.ErrInvalidContentLength)
 	if !ok {
@@ -94,7 +94,7 @@ func TestBodyReaderFactoryTransferEncodingTakesPrecedence(t *testing.T) {
 	bodyReader, err := r.bodyReaderFactory(headers)
 
 	if err == nil {
-		t.Error("bodyReaderFactory() expected error, got nil")
+		t.Error("bodyReaderFactory() returned nil error for unsupported transfer encoding, expected non-nil error")
 	}
 	_, ok := err.(pkgerrors.ErrUnsupportedBodyTransferEncoding)
 	if !ok {
@@ -129,7 +129,7 @@ func TestParseInvalidRequestLine(t *testing.T) {
 	result, err := r.Parse(reader)
 
 	if err == nil {
-		t.Error("Parse() expected error, got nil")
+		t.Error("Parse() returned nil error, expected non-nil error")
 	}
 	if result != nil {
 		t.Errorf("Parse() returned %v, expected nil", result)
@@ -144,7 +144,7 @@ func TestParseInvalidHeaders(t *testing.T) {
 	result, err := r.Parse(reader)
 
 	if err == nil {
-		t.Error("Parse() expected error, got nil")
+		t.Error("Parse() returned nil error, expected non-nil error")
 	}
 	if result != nil {
 		t.Errorf("Parse() returned %v, expected nil", result)
@@ -159,7 +159,7 @@ func TestParseUnsupportedTransferEncoding(t *testing.T) {
 	result, err := r.Parse(reader)
 
 	if err == nil {
-		t.Error("Parse() expected error, got nil")
+		t.Error("Parse() returned nil error, expected non-nil error")
 	}
 	if result != nil {
 		t.Errorf("Parse() returned %v, expected nil", result)

@@ -126,11 +126,11 @@ func TestFind(t *testing.T) {
 			found := node.find(tc.hash)
 
 			if tc.expectFound && found == nil {
-				t.Error("expected to find child, got nil")
+				t.Errorf("find(%d) returned nil, expected to find child node", tc.hash)
 			}
 
 			if !tc.expectFound && found != nil {
-				t.Errorf("expected nil, got %v", found)
+				t.Errorf("find(%d) returned %v, expected nil", tc.hash, found)
 			}
 		})
 	}
@@ -160,11 +160,11 @@ func TestWildcard(t *testing.T) {
 			found := node.wildcard()
 
 			if tc.addWildcard && found == nil {
-				t.Error("expected to find wildcard, got nil")
+				t.Error("wildcard() returned nil, expected to find wildcard child node")
 			}
 
 			if !tc.addWildcard && found != nil {
-				t.Errorf("expected nil, got %v", found)
+				t.Errorf("wildcard() returned %v, expected nil when no wildcard was added", found)
 			}
 		})
 	}

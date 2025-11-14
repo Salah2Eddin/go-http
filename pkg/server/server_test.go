@@ -14,7 +14,7 @@ func TestNewServer(t *testing.T) {
 	server := NewServer()
 
 	if server == nil {
-		t.Fatal("expected non-nil server")
+		t.Fatal("NewServer() returned nil, expected non-nil server instance")
 	}
 
 	if server.addr.Port != "8576" {
@@ -22,19 +22,19 @@ func TestNewServer(t *testing.T) {
 	}
 
 	if server.router == nil {
-		t.Error("expected router to be initialized")
+		t.Error("NewServer() returned server with nil router, expected non-nil router to be initialized")
 	}
 
 	if server.serializer == nil {
-		t.Error("expected serializer to be initialized")
+		t.Error("NewServer() returned server with nil serializer, expected non-nil serializer to be initialized")
 	}
 
 	if server.reader == nil {
-		t.Error("expected reader to be initialized")
+		t.Error("NewServer() returned server with nil reader, expected non-nil reader to be initialized")
 	}
 
 	if server.errorResponder == nil {
-		t.Error("expected errorResponder to be initialized")
+		t.Error("NewServer() returned server with nil errorResponder, expected non-nil errorResponder to be initialized")
 	}
 }
 func TestNewServerWithOptions(t *testing.T) {
@@ -123,7 +123,7 @@ func TestCloseListener(t *testing.T) {
 	closeListener(listener)
 
 	if !listener.closed {
-		t.Error("expected listener to be closed")
+		t.Error("listener.closed is false, expected listener to be closed after closeListener()")
 	}
 }
 

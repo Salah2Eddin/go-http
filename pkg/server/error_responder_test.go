@@ -29,7 +29,7 @@ func TestGenerateResponseLine(t *testing.T) {
 	statusLine := responder.generateResponseLine(appErr)
 
 	if statusLine == nil {
-		t.Fatal("expected non-nil status line")
+		t.Fatal("generateResponseStatusLine() returned nil status line, expected non-nil status line")
 	}
 }
 
@@ -39,7 +39,7 @@ func TestGenerateResponseHeaders(t *testing.T) {
 	headers := responder.generateResponseHeaders()
 
 	if headers == nil {
-		t.Fatal("expected non-nil headers")
+		t.Fatal("generateResponseHeaders() returned nil headers, expected non-nil headers")
 	}
 
 	contentType, ok := headers.Get("content-type")
@@ -112,6 +112,6 @@ func TestFrom(t *testing.T) {
 	resp := responder.From(appErr)
 
 	if resp == nil {
-		t.Fatal("expected non-nil response")
+		t.Fatal("From() returned nil response, expected non-nil response")
 	}
 }

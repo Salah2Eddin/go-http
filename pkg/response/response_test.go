@@ -15,7 +15,7 @@ func TestNewEmptyResponse(t *testing.T) {
 		t.Errorf("Line = %v, want %v", resp.Line, line)
 	}
 	if resp.Headers == nil {
-		t.Error("Headers should be initialized, got nil")
+		t.Error("NewEmptyResponse() returned response with nil Headers, expected non-nil initialized headers")
 	}
 	if len(resp.Body) != 0 {
 		t.Errorf("Body = %v, want empty", resp.Body)
