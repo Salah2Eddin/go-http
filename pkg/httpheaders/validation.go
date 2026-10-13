@@ -13,7 +13,7 @@ func validHeaderName(nameBytes []byte) bool {
 			return false
 		}
 	}
-	return true
+	return len(nameBytes) > 0
 }
 
 func validHeaderValue(valueBytes []byte) bool {
