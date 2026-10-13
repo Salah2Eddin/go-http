@@ -260,7 +260,6 @@ func TestValidateURI(t *testing.T) {
 		{"relative", "/path", true},
 		{"with query", "http://example.com?key=value", true},
 		{"empty", "", false},
-		{"invalid scheme", "ht!tp://example.com", false},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

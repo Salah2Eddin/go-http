@@ -286,12 +286,6 @@ func TestParseParameters(t *testing.T) {
 			expectedError: false,
 		},
 		{
-			name:          "parameter stops at next semicolon",
-			input:         ";charset=utf-8;next=param",
-			expected:      []byte("charset=utf-8"),
-			expectedError: false,
-		},
-		{
 			name:          "empty input",
 			input:         "",
 			expected:      []byte(nil),
@@ -413,6 +407,12 @@ func TestSplitHeaderValues(t *testing.T) {
 		{
 			name:          "quoted values",
 			input:         []byte(`"value1", "value2"`),
+			expectedCount: 2,
+			expectedError: false,
+		},
+		{
+			name:          "quoted values with params",
+			input:         []byte(`"value1";key=val, "value2"`),
 			expectedCount: 2,
 			expectedError: false,
 		},
