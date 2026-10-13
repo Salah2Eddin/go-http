@@ -6,6 +6,7 @@ type IValueFormatter interface {
 
 var formatters = map[string]IValueFormatter{
 	"content-type": IdentityFormatter{},
+	"accept":       IdentityFormatter{},
 	"default":      QuotedFormatter{},
 }
 
