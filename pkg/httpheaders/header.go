@@ -12,8 +12,8 @@ func NewHeader(name string, values []*Value) *Header {
 	}
 }
 
-func NewHeaderFromString(name string, value string) (*Header, error) {
-	values, err := processHeaderValues([]byte(value))
+func NewHeaderFromString(name string, headerStr string) (*Header, error) {
+	values, err := processHeaderValues([]byte(headerStr))
 	if err != nil {
 		return nil, err
 	}
