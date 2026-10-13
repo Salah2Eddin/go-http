@@ -76,7 +76,7 @@ func parseParameters(reader *bytes.Reader) ([]byte, error) {
 				if err != nil {
 					return nil, err
 				}
-				if b == valueSeparatorByte || b == paramSeparatorByte {
+				if b == valueSeparatorByte {
 					break
 				} else {
 					value = append(value, b)
