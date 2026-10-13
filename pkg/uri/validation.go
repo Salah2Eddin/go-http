@@ -314,9 +314,7 @@ func isValidPath(path string) bool {
 	}
 
 	if fragmentIndex != -1 {
-		if queryIndex != -1 && queryIndex > fragmentIndex {
-			// Already handled above
-		} else {
+		if queryIndex == -1 {
 			pathOnly = path[:fragmentIndex]
 		}
 
