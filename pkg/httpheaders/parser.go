@@ -76,7 +76,7 @@ func parseParameters(reader *bytes.Reader) ([]byte, error) {
 				if err != nil {
 					return nil, err
 				}
-				if b == valueSeparatorByte || b == paramSeparatorByte {
+				if b == valueSeparatorByte {
 					break
 				} else {
 					value = append(value, b)
@@ -124,12 +124,14 @@ func parseQuotedValue(reader *bytes.Reader) ([]byte, error) {
 						return nil, err
 					}
 					// skip white spaces
-					if charutil.IsWhiteSpaceASCII(b) {
+					if charutil.IsWhiteSpaceASCII(b) || b == valueSeparatorByte {
 						_, err = reader.ReadByte()
 						if err != nil {
 							return nil, err
 						}
-						continue
+						if charutil.IsWhiteSpaceASCII(b) {
+							continue
+						}
 					}
 					// only parameters and other values are allowed after a quoted value
 					if b == paramSeparatorByte || b == valueSeparatorByte {

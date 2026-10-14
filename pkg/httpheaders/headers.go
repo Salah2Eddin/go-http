@@ -30,8 +30,9 @@ func (headers *Headers) AddFromHeader(header *Header) {
 		for _, value := range header.Values() {
 			h.AddValue(value)
 		}
+	} else {
+		headers.headers[name] = header
 	}
-	headers.headers[name] = header
 }
 
 func (headers *Headers) Get(name string) (*Header, bool) {
