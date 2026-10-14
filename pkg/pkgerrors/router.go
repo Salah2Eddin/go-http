@@ -17,3 +17,20 @@ type ErrRouteNotFound struct {
 func (err ErrRouteNotFound) Error() string {
 	return fmt.Sprintf("%s doesn't exist", err.Route)
 }
+
+func (err ErrRouteNotFound) HTTPStatusCode() int {
+	return 404
+}
+
+type ErrMethodNotAllowed struct {
+	Method string
+	Uri    string
+}
+
+func (err ErrMethodNotAllowed) Error() string {
+	return fmt.Sprintf("Method %s is not allowed for URI %s", err.Method, err.Uri)
+}
+
+func (err ErrMethodNotAllowed) HTTPStatusCode() int {
+	return 405
+}

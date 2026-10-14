@@ -1,10 +1,10 @@
-package parsers
+package httpheaders
 
 import (
-	"bufio"
 	"bytes"
+
 	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
-	"github.com/Salah2Eddin/go-http/pkg/request"
+	"github.com/Salah2Eddin/go-http/pkg/util"
 	"github.com/Salah2Eddin/go-http/pkg/util/charutil"
 )
 
@@ -15,48 +15,13 @@ const (
 	paramSeparatorByte = byte(0x3b)
 )
 
-func checkHeadersEnd(bytes *[]byte) bool {
-	return len(*bytes) == 0
-}
-
-func validHeaderName(nameBytes []byte) bool {
-	for _, v := range nameBytes {
-		if !charutil.IsVisibleASCII(v) {
-			return false
-		}
-
-		// No whitespace is allowed between the field(header) name and colon (RFC9112 5.1)
-		if charutil.IsWhiteSpaceASCII(v) {
-			return false
-		}
-	}
-	return true
-}
-
-func validHeaderValue(valueBytes []byte) bool {
-	for _, v := range valueBytes {
-		/*
-			a recipient of CR, LF, or NUL within a field value
-			MUST either reject the message or replace each of those characters with SP.
-			Field values containing other CTL characters are also invalid;
-			however, recipients MAY retain such characters for
-			the sake of robustness when they appear within a safe context
-			RFC9110 5.5
-		*/
-		if charutil.IsCTLCharASCII(v) {
-			return false
-		}
-	}
-	return true
-}
-
 func processHeaderName(nameBytes []byte) string {
 	// lowercase to guarantee case insensitivity
 	processedBytes := bytes.ToLower(nameBytes)
 	return string(processedBytes)
 }
 
-func readUnquotedValue(reader *bytes.Reader) ([]byte, error) {
+func parseUnquotedValue(reader *bytes.Reader) ([]byte, error) {
 	value := make([]byte, 0)
 	whiteSpaces := make([]byte, 0)
 
@@ -69,7 +34,7 @@ func readUnquotedValue(reader *bytes.Reader) ([]byte, error) {
 			// , works as a value separator only outside parentheses
 			return value, nil
 		} else if b == doubleQuotesByte {
-			return nil, &pkgerrors.ErrInvalidHeader{}
+			return nil, pkgerrors.ErrInvalidHeader{Reason: "Unquoted value contains quotes"}
 		} else if charutil.IsWhiteSpaceASCII(b) {
 			// leading white spaces are ignored
 			if len(value) == 0 {
@@ -78,6 +43,10 @@ func readUnquotedValue(reader *bytes.Reader) ([]byte, error) {
 			whiteSpaces = append(whiteSpaces, b)
 		} else if b == paramSeparatorByte {
 			// ; works as a param separator outside parentheses
+			err := reader.UnreadByte()
+			if err != nil {
+				return nil, err
+			}
 			break
 		} else {
 			// trailing white spaces are ignored
@@ -89,7 +58,7 @@ func readUnquotedValue(reader *bytes.Reader) ([]byte, error) {
 	return value, nil
 }
 
-func readParameters(reader *bytes.Reader) ([]byte, error) {
+func parseParameters(reader *bytes.Reader) ([]byte, error) {
 	value := make([]byte, 0)
 	// read value parameters
 	for reader.Len() > 0 {
@@ -107,7 +76,7 @@ func readParameters(reader *bytes.Reader) ([]byte, error) {
 				if err != nil {
 					return nil, err
 				}
-				if b == valueSeparatorByte || b == paramSeparatorByte {
+				if b == valueSeparatorByte {
 					break
 				} else {
 					value = append(value, b)
@@ -121,13 +90,13 @@ func readParameters(reader *bytes.Reader) ([]byte, error) {
 			}
 			break
 		} else {
-			return nil, &pkgerrors.ErrInvalidHeader{}
+			return nil, pkgerrors.ErrInvalidHeader{Reason: "parameter parsing invalid syntax"}
 		}
 	}
 	return value, nil
 }
 
-func readQuotedValue(reader *bytes.Reader) ([]byte, error) {
+func parseQuotedValue(reader *bytes.Reader) ([]byte, error) {
 	value := make([]byte, 0)
 	// number of quotes found
 	count := 0
@@ -150,23 +119,25 @@ func readQuotedValue(reader *bytes.Reader) ([]byte, error) {
 				// quoted values can't be followed by unquoted value or comments
 				// example: "quoted"unquoted -> invalid
 				for reader.Len() > 0 {
-					b, err = peek(reader)
+					b, err = util.Peek(reader)
 					if err != nil {
 						return nil, err
 					}
 					// skip white spaces
-					if charutil.IsWhiteSpaceASCII(b) {
+					if charutil.IsWhiteSpaceASCII(b) || b == valueSeparatorByte {
 						_, err = reader.ReadByte()
 						if err != nil {
 							return nil, err
 						}
-						continue
+						if charutil.IsWhiteSpaceASCII(b) {
+							continue
+						}
 					}
 					// only parameters and other values are allowed after a quoted value
 					if b == paramSeparatorByte || b == valueSeparatorByte {
 						return value, nil
 					} else {
-						return nil, &pkgerrors.ErrInvalidHeader{}
+						return nil, pkgerrors.ErrInvalidHeader{Reason: "Unquoted value after quoted value"}
 					}
 				}
 				return value, nil
@@ -175,13 +146,13 @@ func readQuotedValue(reader *bytes.Reader) ([]byte, error) {
 			value = append(value, b)
 		}
 	}
-	return nil, &pkgerrors.ErrInvalidHeader{}
+	return nil, pkgerrors.ErrInvalidHeader{Reason: "Quoted value never closed"}
 }
 
-func readNextValue(reader *bytes.Reader) ([]byte, []byte, error) {
+func parseNextValue(reader *bytes.Reader) ([]byte, []byte, error) {
 	value := make([]byte, 0)
 	for reader.Len() > 0 {
-		b, err := peek(reader)
+		b, err := util.Peek(reader)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -194,9 +165,9 @@ func readNextValue(reader *bytes.Reader) ([]byte, []byte, error) {
 		}
 
 		if b == doubleQuotesByte {
-			value, err = readQuotedValue(reader)
+			value, err = parseQuotedValue(reader)
 		} else {
-			value, err = readUnquotedValue(reader)
+			value, err = parseUnquotedValue(reader)
 		}
 		if err != nil {
 			return nil, nil, err
@@ -204,9 +175,9 @@ func readNextValue(reader *bytes.Reader) ([]byte, []byte, error) {
 
 		var params []byte
 		if reader.Len() > 0 {
-			b, err = peek(reader)
+			b, err = util.Peek(reader)
 			if b == paramSeparatorByte {
-				params, err = readParameters(reader)
+				params, err = parseParameters(reader)
 				if err != nil {
 					return nil, nil, err
 				}
@@ -214,7 +185,7 @@ func readNextValue(reader *bytes.Reader) ([]byte, []byte, error) {
 		}
 		return value, params, nil
 	}
-	return nil, nil, &pkgerrors.ErrInvalidHeader{}
+	return nil, nil, pkgerrors.ErrInvalidHeader{Reason: "Header value parsing fails"}
 }
 
 func splitHeaderValues(valueBytes []byte) ([][]byte, [][]byte, error) {
@@ -222,7 +193,7 @@ func splitHeaderValues(valueBytes []byte) ([][]byte, [][]byte, error) {
 	values := make([][]byte, 0)
 	params := make([][]byte, 0)
 	for valueBytesStream.Len() > 0 {
-		value, param, err := readNextValue(valueBytesStream)
+		value, param, err := parseNextValue(valueBytesStream)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -232,19 +203,19 @@ func splitHeaderValues(valueBytes []byte) ([][]byte, [][]byte, error) {
 	return values, params, nil
 }
 
-func processHeaderValues(valueBytes []byte) ([]request.HeaderValue, error) {
+func processHeaderValues(valueBytes []byte) ([]*Value, error) {
 	values, params, err := splitHeaderValues(valueBytes)
 	if err != nil {
 		return nil, err
 	}
-	headerValues := make([]request.HeaderValue, 0)
+	headerValues := make([]*Value, 0)
 	for i := range values {
 		// Empty elements do not contribute to the count of elements present.
 		// RFC9110 5.6.1.2
 		if len(values[i]) == 0 {
 			continue
 		}
-		value := request.NewHeaderValue(values[i], params[i])
+		value := NewHeaderValueFromBytes(values[i], params[i])
 		headerValues = append(headerValues, value)
 	}
 	/*
@@ -252,58 +223,46 @@ func processHeaderValues(valueBytes []byte) ([]request.HeaderValue, error) {
 		RFC9110 5.6.1.2
 	*/
 	if len(values) == 0 {
-		return nil, &pkgerrors.ErrInvalidHeader{}
+		return nil, pkgerrors.ErrInvalidHeader{Reason: "No non-empty header values"}
 	}
 
 	return headerValues, nil
 }
 
 func nameValueSplit(headerLineBytes []byte) ([]byte, []byte, bool) {
-	// COLON splits header into key and value
+	// COLON splits headers into key and value
 	COLON := byte(0x3A)
 
 	return bytes.Cut(headerLineBytes, []byte{COLON})
 }
 
-func parseHeaderLine(headerLineBytes []byte) (request.Header, error) {
+func parseHeaderLine(headerLineBytes []byte) (*Header, error) {
 	nameBytes, valueBytes, found := nameValueSplit(headerLineBytes)
-	if !found || !validHeaderName(nameBytes) || !validHeaderValue(valueBytes) {
-		return request.Header{}, pkgerrors.ErrInvalidHeader{}
+	if !found {
+		return nil, pkgerrors.ErrInvalidHeader{Reason: "Header line name and value delimiter not found"}
+	} else if !validHeaderName(nameBytes) {
+		return nil, pkgerrors.ErrInvalidHeader{Reason: "Invalid header name"}
+	} else if !validHeaderValue(valueBytes) {
+		return nil, pkgerrors.ErrInvalidHeader{Reason: "Invalid header value"}
 	}
 
 	name := processHeaderName(nameBytes)
 	values, err := processHeaderValues(valueBytes)
 	if err != nil {
-		return request.Header{}, pkgerrors.ErrInvalidHeader{}
+		return nil, err
 	}
-	header := request.NewHeader(name, values)
+	header := NewHeader(name, values)
 	return header, nil
 }
 
-func getRequestHeaders(reader *bufio.Reader) (request.Headers, error) {
-	var headersBytes [][]byte
-	for {
-		headerBytes, err := readLine(reader)
-		if err != nil {
-			return request.Headers{}, err
-		}
-
-		if checkHeadersEnd(&headerBytes) {
-			break
-		}
-		headersBytes = append(headersBytes, headerBytes)
-	}
-	return parseRequestHeaders(&headersBytes)
-}
-
-func parseRequestHeaders(lines *[][]byte) (request.Headers, error) {
-	headers := request.NewRequestHeaders()
-	for _, line := range *lines {
+func ParseRequestHeaders(lines [][]byte) (*Headers, error) {
+	headers := New()
+	for _, line := range lines {
 		header, err := parseHeaderLine(line)
 		if err != nil {
-			return request.Headers{}, err
+			return nil, err
 		}
-		headers.Add(header)
+		headers.AddFromHeader(header)
 	}
 
 	return headers, nil

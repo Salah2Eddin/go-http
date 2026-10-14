@@ -20,7 +20,7 @@ type routerTreeNode struct {
 
 func (node *routerTreeNode) addChild(hash int, child *routerTreeNode) error {
 	if _, exists := node.children[hash]; exists {
-		return &pkgerrors.ErrRouteExists{}
+		return pkgerrors.ErrRouteExists{}
 	}
 	node.children[hash] = child
 	return nil
@@ -28,7 +28,7 @@ func (node *routerTreeNode) addChild(hash int, child *routerTreeNode) error {
 
 func (node *routerTreeNode) addWildcardChild(child *routerTreeNode) error {
 	if _, exists := node.children[wildcardHash]; exists {
-		return &pkgerrors.ErrRouteExists{Route: "*"}
+		return pkgerrors.ErrRouteExists{Route: "*"}
 	}
 	node.children[wildcardHash] = child
 	return nil

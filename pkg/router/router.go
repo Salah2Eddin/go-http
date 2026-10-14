@@ -1,49 +1,76 @@
 package router
 
 import (
-	"github.com/Salah2Eddin/go-http/pkg/request"
-	"github.com/Salah2Eddin/go-http/pkg/response"
-	"github.com/Salah2Eddin/go-http/pkg/response/statuscodes"
+	"github.com/Salah2Eddin/go-http/pkg/pkgerrors"
 	"github.com/Salah2Eddin/go-http/pkg/uri"
 )
 
 type Router struct {
-	routes map[int]Route
+	routes map[int]*Route
 	tree   RoutesTree
 }
 
-func NewRouter() Router {
+func NewRouter() *Router {
 	router := Router{
-		routes: make(map[int]Route),
+		routes: make(map[int]*Route),
 		tree:   NewRoutesTree(),
 	}
-	return router
+	return &router
 }
 
-func (router *Router) NewRoute(uri uri.Uri) (Route, error) {
-	route := newRoute()
+func (router *Router) newRoute(uri *uri.Uri) (*Route, error) {
 	id, err := router.tree.addRoute(uri)
 	if err != nil {
-		return Route{}, err
+		return nil, err
 	}
-	router.routes[id] = route
-	return route, nil
-}
-
-func (router *Router) GetRoute(uri uri.Uri, allowWildcard bool) (Route, error) {
-	id, err := router.tree.find(uri, allowWildcard)
-	if err != nil {
-		return Route{}, err
-	}
-	// at this point, a route with id is guaranteed to exist
+	router.routes[id] = newRoute()
 	return router.routes[id], nil
 }
 
-func (router *Router) RouteRequest(request request.Request) response.Response {
-	route, err := router.GetRoute(request.Uri(), true)
+func (router *Router) getOrCreateRoute(uri *uri.Uri) (*Route, error) {
+	route, err := router.getRoute(uri, false)
 	if err != nil {
-		return response.NewEmptyResponse(statuscodes.Status404())
+		route, err = router.newRoute(uri)
+		if err != nil {
+			return nil, err
+		}
 	}
-	resp := route.handle(request)
-	return resp
+	return route, nil
+}
+
+func (router *Router) getRoute(uri *uri.Uri, allowWildcardInURI bool) (*Route, error) {
+	id, err := router.tree.find(uri, allowWildcardInURI)
+	if err != nil {
+		return nil, err
+	}
+	route := router.routes[id]
+	if route == nil {
+		return nil, &pkgerrors.ErrRouteNotFound{Route: uri.String()}
+	}
+	return route, nil
+}
+
+// AddHandler Registers a new handler for the given URI and HTTP method.
+// If the route corresponding to the URI does not exist, a new route is created.
+func (router *Router) AddHandler(uri *uri.Uri, method string, handler Handler) error {
+	route, err := router.getOrCreateRoute(uri)
+	if err != nil {
+		return err
+	}
+	route.AddHandler(method, handler)
+	return nil
+}
+
+// GetRequestHandler takes an uri and a method and returns the handler associated with them
+func (router *Router) GetRequestHandler(uri *uri.Uri, method string) (Handler, *pkgerrors.AppError) {
+	route, err := router.getRoute(uri, true)
+	if err != nil {
+		return nil, pkgerrors.NewAppError(err)
+	}
+	handler := route.GetHandler(method)
+	if handler == nil {
+		return nil, pkgerrors.NewAppError(pkgerrors.ErrMethodNotAllowed{Method: method, Uri: uri.String()})
+	}
+
+	return handler, nil
 }

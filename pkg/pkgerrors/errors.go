@@ -1,17 +1,25 @@
 package pkgerrors
 
-import "fmt"
+import "errors"
 
-type ErrInvalidRequestLine struct{}
-
-func (err ErrInvalidRequestLine) Error() string {
-	return "Request is not an HTTP request"
+type AppError struct {
+	wrapped error
 }
 
-type ErrInvalidHeader struct {
-	Line string
+func NewAppError(wrapped error) *AppError {
+	return &AppError{
+		wrapped: wrapped,
+	}
 }
 
-func (err ErrInvalidHeader) Error() string {
-	return fmt.Sprintf("%s is an invalid header", err.Line)
+func (err AppError) HTTPStatusCode() int {
+	var httpErr HTTPError
+	if errors.As(err.wrapped, &httpErr) {
+		return httpErr.HTTPStatusCode()
+	}
+	return 500
+}
+
+func (err AppError) Error() string {
+	return err.wrapped.Error()
 }

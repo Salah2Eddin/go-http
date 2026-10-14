@@ -192,6 +192,9 @@ func isValidIPv4(ip string) bool {
 
 // isValidIPv6 performs a simplified check for IPv6 addresses
 func isValidIPv6(ip string) bool {
+	if ip == "::" || ip == "::1" {
+		return true
+	}
 	segments := strings.Split(ip, IPV6Delimiter)
 
 	// IPv6 address must have between 1 and 8 segments
@@ -311,9 +314,7 @@ func isValidPath(path string) bool {
 	}
 
 	if fragmentIndex != -1 {
-		if queryIndex != -1 && queryIndex > fragmentIndex {
-			// Already handled above
-		} else {
+		if queryIndex == -1 {
 			pathOnly = path[:fragmentIndex]
 		}
 

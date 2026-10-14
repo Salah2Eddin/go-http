@@ -31,3 +31,13 @@ func IsCTLCharASCII(b byte) bool {
 func IsWhiteSpaceASCII(b byte) bool {
 	return b == AsciiSpace || b == AsciiTab
 }
+
+// ValidateAsciiEncoding checks if byte array consists of ASCII characters
+func ValidateAsciiEncoding(bytes []byte) bool {
+	for _, v := range bytes {
+		if !IsASCII(v) {
+			return false
+		}
+	}
+	return true
+}
